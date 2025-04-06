@@ -1,0 +1,60 @@
+/* Product Slider Styles */
+.swiper-slide {
+  height: auto;
+}
+
+#product-slider-1 .swiper-slide,
+#product-slider-2 .swiper-slide,
+#product-slider-3 .swiper-slide,
+#product-slider-4 .swiper-slide,
+#news-slider .swiper-slide {
+  display: flex;
+  justify-content: center;
+}
+
+.swiper-button-next,
+.swiper-button-prev {
+  color: #333;
+  background: rgba(255, 255, 255, 0.8);
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+}
+
+.swiper-button-next:after,
+.swiper-button-prev:after {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.swiper-pagination {
+  position: relative;
+  margin-top: 15px;
+}
+
+.swiper-pagination-bullet {
+  width: 10px;
+  height: 10px;
+  background: #ccc;
+  opacity: 1;
+}
+
+.swiper-pagination-bullet-active {
+  background: #333;
+}
+
+/* Make sure product cards maintain their style */
+.product-grid-item {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Responsive adjustments */
+@media (max-width: 767px) {
+  .swiper-button-next,
+  .swiper-button-prev {
+    display: none;
+  }
+}

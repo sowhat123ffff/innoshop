@@ -63,7 +63,7 @@
           <div class="module-title-wrap">
             <div class="module-title">{{ __('front/home.feature_product') }}</div>
             <div class="module-sub-title">{{ __('front/home.feature_product_text') }}</div>
-            
+
           </div>
 
           <ul class="nav nav-tabs">
@@ -80,16 +80,55 @@
             @foreach ($tab_products as $item)
               <div class="tab-pane fade show {{ $loop->first ? 'active' : '' }}"
                    id="module-product-tab-x-{{ $loop->iteration }}">
-                <div class="row gx-3 gx-lg-4">
-                  @foreach ($item['products'] as $product)
-                    <div class="col-6 col-md-4 col-lg-3">
-                      @include('shared.product')
-                    </div>
-                  @endforeach
+                <div class="swiper" id="product-slider-{{ $loop->iteration }}">
+                  <div class="swiper-wrapper">
+                    @foreach ($item['products'] as $product)
+                      <div class="swiper-slide">
+                        @include('shared.product')
+                      </div>
+                    @endforeach
+                  </div>
+                  <div class="swiper-button-next"></div>
+                  <div class="swiper-button-prev"></div>
+                  <div class="swiper-pagination"></div>
                 </div>
               </div>
             @endforeach
           </div>
+
+          <script>
+            document.addEventListener('DOMContentLoaded', function() {
+              @foreach ($tab_products as $item)
+                new Swiper('#product-slider-{{ $loop->iteration }}', {
+                  slidesPerView: 1,
+                  spaceBetween: 10,
+                  loop: {{ count($item['products']) > 4 ? 'true' : 'false' }},
+                  pagination: {
+                    el: '#product-slider-{{ $loop->iteration }} .swiper-pagination',
+                    clickable: true,
+                  },
+                  navigation: {
+                    nextEl: '#product-slider-{{ $loop->iteration }} .swiper-button-next',
+                    prevEl: '#product-slider-{{ $loop->iteration }} .swiper-button-prev',
+                  },
+                  breakpoints: {
+                    640: {
+                      slidesPerView: 2,
+                      spaceBetween: 15,
+                    },
+                    768: {
+                      slidesPerView: 3,
+                      spaceBetween: 15,
+                    },
+                    1024: {
+                      slidesPerView: 4,
+                      spaceBetween: 20,
+                    },
+                  },
+                });
+              @endforeach
+            });
+          </script>
         </div>
       </div>
     </section>
@@ -112,13 +151,50 @@
             <div class="module-sub-title">{{ __('front/home.news_blog_text') }}</div>
           </div>
 
-          <div class="row gx-3 gx-lg-4">
-            @foreach ($news as $new)
-              <div class="col-6 col-md-4 col-lg-3">
-                @include('shared.blog', ['item'=>$new])
-              </div>
-            @endforeach
+          <div class="swiper" id="news-slider">
+            <div class="swiper-wrapper">
+              @foreach ($news as $new)
+                <div class="swiper-slide">
+                  @include('shared.blog', ['item'=>$new])
+                </div>
+              @endforeach
+            </div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+            <div class="swiper-pagination"></div>
           </div>
+
+          <script>
+            document.addEventListener('DOMContentLoaded', function() {
+              new Swiper('#news-slider', {
+                slidesPerView: 1,
+                spaceBetween: 10,
+                loop: {{ count($news) > 4 ? 'true' : 'false' }},
+                pagination: {
+                  el: '#news-slider .swiper-pagination',
+                  clickable: true,
+                },
+                navigation: {
+                  nextEl: '#news-slider .swiper-button-next',
+                  prevEl: '#news-slider .swiper-button-prev',
+                },
+                breakpoints: {
+                  640: {
+                    slidesPerView: 2,
+                    spaceBetween: 15,
+                  },
+                  768: {
+                    slidesPerView: 3,
+                    spaceBetween: 15,
+                  },
+                  1024: {
+                    slidesPerView: 4,
+                    spaceBetween: 20,
+                  },
+                },
+              });
+            });
+          </script>
         </div>
       </div>
     </section>
