@@ -22,3 +22,6 @@ auth.json
 npm-debug.log
 yarn-error.log
 webpack.mix.js
+package-lock.json
+composer.lock
+Architecture.md
