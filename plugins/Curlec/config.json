@@ -1,0 +1,18 @@
+{
+  "code": "curlec",
+  "name": {
+    "en": "Curlec (Razorpay)",
+    "zh_cn": "Curlec（Razorpay）"
+  },
+  "description": {
+    "en": "Accept payments via Curlec powered by Razorpay.",
+    "zh_cn": "通过 Razorpay 的 Curlec 支付网关收款。"
+  },
+  "type": "billing",
+  "version": "v1.0.0",
+  "icon": "/images/curlec-logo.png",
+  "author": {
+    "name": "InnoShop",
+    "email": "team@innoshop.com"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "name": "innoshop/curlec",
+  "description": "Curlec (Razorpay) payment gateway plugin for InnoShop.",
+  "type": "library",
+  "require": {
+    "razorpay/razorpay": "^2.9"
+  },
+  "autoload": {
+    "psr-4": {
+      "Plugin\\Curlec\\": ""
+    }
+  },
+  "license": "OSL-3.0",
+  "authors": [
+    {
+      "name": "InnoShop",
+      "email": "team@innoshop.com"
+    }
+  ]
+}
