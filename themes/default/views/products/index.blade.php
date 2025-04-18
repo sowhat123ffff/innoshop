@@ -76,7 +76,6 @@
         <div class="row gx-3 gx-lg-4 {{ request('style_list') == 'list' ? 'product-list-wrap' : ''}}">
           @foreach ($products as $product)
             <div class="{{ !request('style_list') || request('style_list') == 'grid' ? 'col-6 col-md-4' : 'col-12'}}">
-              <div class="product-title">{!! str_replace(['&lt;br&gt;', '<br>'], '<br>', e($product->fallbackName())) !!}</div>
               @include('shared.product')
             </div>
           @endforeach
