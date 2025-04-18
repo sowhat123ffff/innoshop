@@ -9,30 +9,45 @@
         <i class="bi bi-heart{{ $product->hasFavorite() ? '-fill' : '' }}"></i> {{ __('front/product.add_wishlist') }}
       </div>
     </div>
-    <div class="product-item-info product-hover-title">
+    <div class="product-item-info">
       <div class="product-name">
-          {{ $product->fallbackName() }}
+        <a href="{{ $product->url }}">
+          {!! str_replace(['&lt;br&gt;', '<br>'], '<br>', e($product->fallbackName())) !!}
+        </a>
+      </div>
+
+      @hookinsert('product.list_item.name.after')
+
+      @if(request('style_list') == 'list')
+        <div class="sub-product-title">{{ $product->fallbackName('summary') }}</div>
+      @endif
+
+      <div class="product-bottom">
+        <div class="product-bottom-btns">
+          <div class="btn-add-cart cursor-pointer" data-id="{{ $product->id }}"
+               data-price="{{ $product->masterSku->getFinalPrice() }}"
+               data-sku-id="{{ $product->masterSku->id }}">{{ __('front/cart.add_to_cart') }}
+          </div>
+        </div>
+        <div class="product-price">
+          @if ($product->masterSku->origin_price)
+            <div class="price-old">{{ $product->masterSku->origin_price_format }}</div>
+          @endif
+          <div class="price-new">{{ $product->masterSku->getFinalPriceFormat() }}</div>
+        </div>
       </div>
     </div>
   </div>
 @endif
 
 <style>
-.product-grid-item .product-item-info {
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s;
-  position: absolute;
-  left: 0; right: 0; bottom: 0; top: 0;
-  background: rgba(0,0,0,0.5);
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.1rem;
-  font-weight: bold;
-  text-align: center;
-}
-.product-grid-item { position: relative; overflow: hidden; }
-.product-grid-item:hover .product-item-info { opacity: 1; pointer-events: auto; }
+  .product-grid-item .product-name a {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    display: block;
+    height: auto;
+    line-height: 1.4;
+    word-break: break-word;
+  }
 </style>
