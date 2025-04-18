@@ -2,7 +2,7 @@
     <a href="https://www.innoshop.com"><img src="https://www.innoshop.com/images/logo.png" alt="Total Downloads"></a>
 </p>
 
-----
+---
 
 <p align="center">
     <a href="https://www.innoshop.com"><img src="https://img.shields.io/badge/License-OSL%203.0-green.svg" alt="Total Downloads"></a>
