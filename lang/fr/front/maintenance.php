@@ -8,8 +8,6 @@
  */
 
 return [
-    'edition' => 'community',
-    'version' => '0.4.1',
-    'build'   => '20250414',
-    'api_url' => env('INNOSHOP_API_URL', 'https://www.innoshop.cn'),
+    'description' => 'Magasin temporairement fermé. Attendez que le propriétaire reprenne ses activités.',
+    'title'       => 'La boutique est temporairement inaccessible',
 ];

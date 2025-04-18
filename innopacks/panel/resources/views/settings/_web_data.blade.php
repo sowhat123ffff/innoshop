@@ -72,11 +72,21 @@
     <div class="row mb-4">
       <div class="col-md-6">
         <div class="mb-4">
+          <x-common-form-switch-radio title="{{ __('panel/setting.online_order') }}" name="online_order" required
+                                  value="{{ old('online_order', system_setting('online_order', true)) }}"/>
+          <p class="text-muted small mt-1">{{ __('panel/setting.online_order_desc') }}</p>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="mb-4">
           <x-common-form-switch-radio title="{{ __('panel/setting.login_checkout') }}" name="login_checkout" required
                                   value="{{ old('login_checkout', system_setting('login_checkout')) }}"/>
           <p class="text-muted small mt-1">{{ __('panel/setting.login_checkout_desc') }}</p>
         </div>
       </div>
+    </div>
+    
+    <div class="row mb-4">
       <div class="col-md-6">
         <div class="mb-4">
           <x-common-form-switch-radio title="{{ __('panel/setting.bought_review') }}" name="bought_review" required
@@ -84,9 +94,6 @@
           <p class="text-muted small mt-1">{{ __('panel/setting.bought_review_desc') }}</p>
         </div>
       </div>
-    </div>
-    
-    <div class="row">
       <div class="col-md-6">
         <div class="mb-4">
           <x-common-form-switch-radio title="{{ __('panel/setting.backstage_menu_expansion') }}" name="expand" required
@@ -94,11 +101,21 @@
           <p class="text-muted small mt-1">{{ __('panel/setting.backstage_menu_expansion_desc') }}</p>
         </div>
       </div>
+    </div>
+    
+    <div class="row">
       <div class="col-md-6">
         <div class="mb-4">
           <x-common-form-switch-radio title="{{ __('panel/setting.debug') }}" name="debug" required
                                   value="{{ old('debug', system_setting('debug')) }}"/>
           <p class="text-muted small mt-1">{{ __('panel/setting.debug_desc') }}</p>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="mb-4">
+          <x-common-form-switch-radio title="{{ __('panel/setting.maintenance_mode') }}" name="maintenance_mode" required
+                                  value="{{ old('maintenance_mode', system_setting('maintenance_mode')) }}"/>
+          <p class="text-muted small mt-1">{{ __('panel/setting.maintenance_mode_desc') }}</p>
         </div>
       </div>
     </div>

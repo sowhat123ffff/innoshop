@@ -8,8 +8,6 @@
  */
 
 return [
-    'edition' => 'community',
-    'version' => '0.4.1',
-    'build'   => '20250414',
-    'api_url' => env('INNOSHOP_API_URL', 'https://www.innoshop.cn'),
+    'description' => 'Kedai ditutup buat sementara waktu. Tunggu pemilik kedai menyambung semula operasi.',
+    'title'       => 'Kedai itu tidak boleh diakses buat sementara waktu',
 ];

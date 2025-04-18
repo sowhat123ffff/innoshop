@@ -8,8 +8,6 @@
  */
 
 return [
-    'edition' => 'community',
-    'version' => '0.4.1',
-    'build'   => '20250414',
-    'api_url' => env('INNOSHOP_API_URL', 'https://www.innoshop.cn'),
+    'description' => '商店暫時關閉。等待店主恢復運營。',
+    'title'       => '商店暫時無法訪問',
 ];
