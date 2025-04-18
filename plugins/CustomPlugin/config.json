@@ -1,0 +1,18 @@
+{
+    "code": "custom_plugin",
+    "name": {
+        "zh_cn": "自定义内容插件",
+        "en": "Custom Content Plugin"
+    },
+    "description": {
+        "zh_cn": "在主题设置页面添加内容标签",
+        "en": "Add Content tab to theme settings page"
+    },
+    "type": "feature",
+    "version": "v1.0.0",
+    "icon": "/image/logo.png",
+    "author": {
+        "name": "InnoShop",
+        "email": "support@innoshop.com"
+    }
+} 

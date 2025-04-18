@@ -27,8 +27,8 @@
           <div class="swiper-pagination"></div>
         </div>
       </section>
-	  
-	  
+
+
       <script>
         var swiper = new Swiper('#module-swiper-1', {
           loop: true,
@@ -46,9 +46,9 @@
 
 
     @hookinsert('home.content.bottom')
-  
+
   @hookinsert('home.content.bottom2')
-  
+
   @hookinsert('home.content.bottom3')
 
     @hookinsert('home.swiper.after')
@@ -103,7 +103,7 @@
                           </div>
                           <div class="product-item-info product-hover-title">
                             <div class="product-name">
-                              <span data-bs-toggle="tooltip" data-placement="top" title="{{ $product->fallbackName() }}">
+                              <span>
                                 {!! str_replace(['&lt;br&gt;', '<br>'], '<br>', e($product->fallbackName())) !!}
                               </span>
                             </div>
@@ -162,9 +162,9 @@
         }
       </style>
     </section>
-	
-	
-	
+
+
+
 
     @if (0)
       <section class="module-line">
