@@ -18,7 +18,7 @@ class Boot
         listen_blade_insert('themes.settings.nav', function ($data) {
             return '<a class="nav-link" href="#" data-bs-toggle="tab" data-bs-target="#tab-setting-content">' . trans('CustomPlugin::common.content') . '</a>';
         });
-        
+
         // 添加Content标签对应的内容面板
         listen_blade_insert('themes.settings.tabs', function ($data) {
             return '
@@ -30,7 +30,7 @@ class Boot
                       <div class="card-body">
                         <div class="mb-3">
                           <label class="form-label">' . trans('CustomPlugin::common.page_title') . '</label>
-                          <input type="text" name="content_title" class="form-control" 
+                          <input type="text" name="content_title" class="form-control"
                                  value="' . system_setting('content_title', '') . '">
                         </div>
                         <div class="mb-3">
@@ -47,72 +47,72 @@ class Boot
                 </div>
               </div>';
         });
-        
+
         // 在首页添加自定义产品区块1
         $this->setupProductSection(1);
-        
+
         // 在首页添加自定义产品区块2
         $this->setupProductSection(2);
-        
+
         // 在首页添加自定义产品区块3
         $this->setupProductSection(3);
-        
+
         // 添加产品选择面板的钩子（在产品编辑页面）
         listen_blade_insert('panel.product.edit.tab.nav.bottom', function ($data) {
             return '
               <li class="nav-item" role="presentation">
-                <button class="nav-link" id="custom-section-tab" data-bs-toggle="tab" 
-                  data-bs-target="#custom-section-tab-pane" type="button" role="tab" 
+                <button class="nav-link" id="custom-section-tab" data-bs-toggle="tab"
+                  data-bs-target="#custom-section-tab-pane" type="button" role="tab"
                   aria-controls="custom-section-tab-pane" aria-selected="false">
                   ' . trans('CustomPlugin::common.product_selection') . '
                 </button>
               </li>';
         });
-        
+
         // 添加产品选择面板内容
         listen_blade_insert('panel.product.edit.tab.pane.bottom', function ($data) {
             return '
-              <div class="tab-pane fade" id="custom-section-tab-pane" role="tabpanel" 
+              <div class="tab-pane fade" id="custom-section-tab-pane" role="tabpanel"
                 aria-labelledby="custom-section-tab" tabindex="0">
                 <div class="row mb-3">
                   <div class="col-12">
                     <h5 class="my-3">' . trans('CustomPlugin::common.selected_products') . '</h5>
                     <p class="text-muted">' . trans('CustomPlugin::common.product_ids_help') . '</p>
-                    
+
                     <div class="form-check my-3">
                       <input class="form-check-input" type="checkbox" id="add-to-section-1">
                       <label class="form-check-label" for="add-to-section-1">
                         ' . trans('CustomPlugin::common.enable_custom_section') . ' (' . $this->getMultiLangSetting('section_title', 'Custom Products 1') . ')
                       </label>
                     </div>
-                    
+
                     <div class="form-check my-3">
                       <input class="form-check-input" type="checkbox" id="add-to-section-2">
                       <label class="form-check-label" for="add-to-section-2">
                         ' . trans('CustomPlugin::common.enable_custom_section_2') . ' (' . $this->getMultiLangSetting('section_title_2', 'Custom Products 2') . ')
                       </label>
                     </div>
-                    
+
                     <div class="form-check my-3">
                       <input class="form-check-input" type="checkbox" id="add-to-section-3">
                       <label class="form-check-label" for="add-to-section-3">
                         ' . trans('CustomPlugin::common.enable_custom_section_3') . ' (' . $this->getMultiLangSetting('section_title_3', 'Custom Products 3') . ')
                       </label>
                     </div>
-                    
+
                     <div class="d-grid gap-2 d-md-block mt-3">
                       <button type="button" class="btn btn-primary" id="save-product-sections">
                         ' . trans('panel/common.save') . '
                     </button>
                     </div>
-                    
+
                     <script>
                       document.addEventListener("DOMContentLoaded", function() {
                         // 获取当前产品ID
                         const productIdFromUrl = window.location.pathname.split("/").pop();
                         // 如果是纯数字则使用，否则尝试从表单获取
                         let productId = /^\d+$/.test(productIdFromUrl) ? productIdFromUrl : null;
-                        
+
                         // 如果URL中的不是数字ID，尝试从表单获取
                         if (!productId) {
                           const form = document.getElementById("product-form");
@@ -126,7 +126,7 @@ class Boot
                             }
                           }
                         }
-                        
+
                         // 如果没有有效的产品ID，则隐藏或禁用相关功能
                         if (!productId || productId === "edit" || isNaN(parseInt(productId))) {
                           console.log("有效的产品ID不可用，可能是新产品创建页面");
@@ -134,13 +134,13 @@ class Boot
                           document.getElementById("save-product-sections").disabled = true;
                           return;
                         }
-                        
+
                         // 初始化选择状态
                         const initSectionCheck = async function() {
                           try {
                             const response = await fetch(urls.base_url + "/plugins/CustomPlugin/check-product?id=" + productId);
                             const data = await response.json();
-                            
+
                             if(data.section1) document.getElementById("add-to-section-1").checked = true;
                             if(data.section2) document.getElementById("add-to-section-2").checked = true;
                             if(data.section3) document.getElementById("add-to-section-3").checked = true;
@@ -148,13 +148,13 @@ class Boot
                             console.error("Error loading product section data:", e);
                           }
                         };
-                        
+
                         // 保存选择
                         document.getElementById("save-product-sections").addEventListener("click", async function() {
                           const section1 = document.getElementById("add-to-section-1").checked;
                           const section2 = document.getElementById("add-to-section-2").checked;
                           const section3 = document.getElementById("add-to-section-3").checked;
-                          
+
                           try {
                             const response = await fetch(urls.base_url + "/plugins/CustomPlugin/save-product-sections", {
                               method: "POST",
@@ -169,9 +169,9 @@ class Boot
                                 section3
                               })
                             });
-                            
+
                             const result = await response.json();
-                            
+
                             if(result.success) {
                               inno.msg("Product sections saved successfully");
                             } else {
@@ -182,7 +182,7 @@ class Boot
                             inno.msg("Error saving product sections", "error");
                           }
                         });
-                        
+
                         // 初始化
                         initSectionCheck();
                       });
@@ -192,7 +192,7 @@ class Boot
             </div>';
         });
     }
-    
+
     /**
      * 设置产品区块
      */
@@ -200,29 +200,29 @@ class Boot
     {
         // 设置钩子位置
         $hookPosition = $sectionNumber === 1 ? 'home.content.bottom' : 'home.content.bottom' . $sectionNumber;
-        
+
         // 设置配置键名
         $enableKey = $sectionNumber === 1 ? 'enable_custom_section' : 'enable_custom_section_' . $sectionNumber;
         $titleKey = $sectionNumber === 1 ? 'section_title' : 'section_title_' . $sectionNumber;
         $subtitleKey = $sectionNumber === 1 ? 'section_subtitle' : 'section_subtitle_' . $sectionNumber;
         $productIdsKey = 'product_ids_' . $sectionNumber;
-        
+
         // 监听对应钩子
         listen_blade_insert($hookPosition, function ($data) use ($sectionNumber, $enableKey, $titleKey, $subtitleKey, $productIdsKey) {
             // Debug信息
-            $debugInfo = '<!-- CustomPlugin区块' . $sectionNumber . '钩子被触发! 开关状态: ' . 
+            $debugInfo = '<!-- CustomPlugin区块' . $sectionNumber . '钩子被触发! 开关状态: ' .
                         (plugin_setting('CustomPlugin', $enableKey, false) ? '开启' : '关闭') . ' -->';
-            
+
             // 检查开关是否打开
             if (!plugin_setting('CustomPlugin', $enableKey, false)) {
                 return $debugInfo . '<!-- 开关关闭，不显示自定义产品 -->';
             }
-            
+
             // 获取产品数据
             $customProductIds = plugin_setting('CustomPlugin', $productIdsKey, '');
             $debugInfo .= '<!-- 原始产品ID配置: "' . $customProductIds . '" -->';
             $selectedProductIds = [];
-            
+
             // 解析自定义产品ID
             if (!empty($customProductIds)) {
                 $selectedProductIds = array_filter(array_map('trim', explode("\n", $customProductIds)));
@@ -230,12 +230,12 @@ class Boot
             } else {
                 $debugInfo .= '<!-- 未配置产品ID -->';
             }
-            
+
             // 如果有选定的产品ID，则获取这些产品
             if (!empty($selectedProductIds)) {
                 $randomProducts = [];
                 $errorProducts = [];
-                
+
                 // 直接通过ID获取产品，而不是过滤最新产品
                 foreach ($selectedProductIds as $productId) {
                     try {
@@ -258,13 +258,13 @@ class Boot
                                 }
                             }
                         }
-                        
+
                         if ($product && $product->active) {
                             // 确保产品URL属性存在
                             if (!isset($product->url)) {
                                 $product->url = url('products/' . $product->id);
                             }
-                        $randomProducts[] = $product;
+                            $randomProducts[] = $product;
                             $debugInfo .= '<!-- 成功获取产品ID: ' . $productId . ' -->';
                         } else {
                             $errorProducts[] = $productId;
@@ -275,14 +275,14 @@ class Boot
                         $debugInfo .= '<!-- 获取产品ID: ' . $productId . ' 失败: ' . $e->getMessage() . ' -->';
                     }
                 }
-                
+
                 // 添加详细调试信息
                 $debugInfo .= '<!-- 已选产品ID: ' . implode(',', $selectedProductIds) . ' -->';
                 $debugInfo .= '<!-- 成功获取产品数量: ' . count($randomProducts) . ' -->';
                 if (!empty($errorProducts)) {
                     $debugInfo .= '<!-- 获取失败的产品ID: ' . implode(',', $errorProducts) . ' -->';
                 }
-                
+
                 $customProducts = [];
             } else {
                 // 默认获取最新和热销产品
@@ -298,20 +298,20 @@ class Boot
                 }
                 $debugInfo .= '<!-- 使用默认产品数据 -->';
             }
-            
+
             // Debug信息
             $debugInfo .= '<!-- 产品数量: ' . (empty($selectedProductIds) ? '最新产品=' . count($randomProducts) . '个, 热销产品=' . count($customProducts) . '个' : '选定产品=' . count($randomProducts) . '个') . ' -->';
-            
+
             // 检查是否有产品数据
             if (empty($randomProducts) && empty($customProducts)) {
                 return $debugInfo . '<!-- 没有找到产品数据 -->';
             }
-            
+
             // 添加调试信息
-            $debugInfo .= '<!-- 开始构建产品区块，发现' . (empty($selectedProductIds) ? 
-                '默认产品（最新=' . count($randomProducts) . '，热销=' . count($customProducts) . '）' : 
+            $debugInfo .= '<!-- 开始构建产品区块，发现' . (empty($selectedProductIds) ?
+                '默认产品（最新=' . count($randomProducts) . '，热销=' . count($customProducts) . '）' :
                 '已选产品=' . count($randomProducts) . '个') . ' -->';
-            
+
             // 构建自定义标签页数据
             if (!empty($selectedProductIds)) {
                 $customTabs = [
@@ -332,10 +332,10 @@ class Boot
                     ]
                 ];
             }
-            
+
             // 生成区块ID（确保每个区块的ID不重复）
             $blockId = 'custom-product-section-' . $sectionNumber;
-            
+
             // 返回自定义产品区块HTML
             return $debugInfo . '
             <section class="module-line" id="' . $blockId . '">
@@ -345,11 +345,11 @@ class Boot
                     <div class="module-title">' . $this->getMultiLangSetting($titleKey, 'Custom Products ' . $sectionNumber) . '</div>
                     <div class="module-sub-title">' . $this->getMultiLangSetting($subtitleKey, 'Discover our special items') . '</div>
                   </div>
-                  
+
                   <ul class="nav nav-tabs">
                     ' . $this->renderTabButtons($customTabs, $sectionNumber) . '
                   </ul>
-                  
+
                   <div class="tab-content">
                     ' . $this->renderTabContent($customTabs, $sectionNumber) . '
                   </div>
@@ -358,7 +358,7 @@ class Boot
             </section>';
         });
     }
-    
+
     /**
      * 渲染标签按钮
      */
@@ -369,7 +369,7 @@ class Boot
             if (empty($item['products'])) {
                 continue;
             }
-            
+
             $html .= '
               <li class="nav-item" role="presentation">
                 <button class="nav-link ' . ($index === 0 ? 'active' : '') . '" data-bs-toggle="tab"
@@ -379,7 +379,7 @@ class Boot
         }
         return $html;
     }
-    
+
     /**
      * 渲染标签内容
      */
@@ -390,32 +390,32 @@ class Boot
             if (empty($item['products'])) {
                 continue;
             }
-            
+
             $tabId = "custom-module-product-tab-{$sectionNumber}-" . ($index + 1);
-            
+
             $html .= '
               <div class="tab-pane fade show ' . ($index === 0 ? 'active' : '') . '"
                 id="' . $tabId . '" role="tabpanel">
                 <div class="product-slider-container">
                   <div class="product-slider" id="product-slider-' . $tabId . '">
                     <div class="row product-slider-track">';
-            
+
             if (empty($item['products'])) {
                 $html .= '<div class="col-12"><p class="text-center">' . trans('CustomPlugin::common.no_products') . '</p></div>';
             } else {
                 // 添加产品总数调试信息
                 $html .= '<!-- 开始渲染产品列表，共' . count($item['products']) . '个产品 -->';
-                
+
                 foreach ($item['products'] as $product) {
                     // 添加每个产品的基本信息检查
                     $productDebug = '<!-- 产品ID: ' . ($product->id ?? 'unknown') . ' ';
-                    
+
                     // 简化产品属性检测
                     $hasName = false;
                     $hasImage = false;
                     $hasPrice = false;
                     $productName = 'Product #' . $product->id; // 默认产品名称
-                    
+
                     // 检查名称
                     if (isset($product->name) && !empty($product->name)) {
                         $hasName = true;
@@ -431,12 +431,12 @@ class Boot
                             $productName = $translatedName;
                         }
                     }
-                    
+
                     // 检查图片
                     if (isset($product->image) && !empty($product->image)) {
                         $hasImage = true;
                     }
-                    
+
                     // 检查价格 - 改进为优先使用masterSku的价格
                     $productPrice = 0;
                     if (isset($product->masterSku) && isset($product->masterSku->price) && is_numeric($product->masterSku->price)) {
@@ -450,24 +450,24 @@ class Boot
                         $hasPrice = true;
                         $productPrice = $product->price;
                     }
-                    
+
                     // 构建产品URL
                     $productUrl = isset($product->url) ? $product->url : url('products/' . $product->id);
                     $productId = $product->id ?? 0;
                     $skuId = isset($product->masterSku) && isset($product->masterSku->id) ? $product->masterSku->id : 0;
-                    
+
                     // 调试信息
                     $productDebug .= '名称: ' . ($hasName ? '有' : '无') . ' ';
                     $productDebug .= '图片: ' . ($hasImage ? '有' : '无') . ' ';
                     $productDebug .= '价格: ' . ($hasPrice ? '有' : '无') . ' -->';
                     $html .= $productDebug;
-                    
+
                     // 只有当产品缺少图片或价格时才跳过
                     if (!$hasImage || !$hasPrice) {
                         $html .= '<!-- 产品缺少图片或价格信息，已跳过 -->';
                         continue;
                     }
-                    
+
                     // 使用与原始innoshop一致的HTML结构，但修改为slider-item类
                     $html .= '
                       <div class="col-4 col-md-2 product-slider-item">
@@ -482,11 +482,11 @@ class Boot
                           </div>
                           <div class="product-item-info">
                             <div class="product-name">
-                              <a href="' . $productUrl . '" data-bs-toggle="tooltip" data-placement="top" data-bs-original-title="' . $productName . '">
+                              <a href="' . $productUrl . '">
                                 ' . $productName . '
                               </a>
                             </div>
-                            
+
                             <div class="product-bottom">
                               <div class="product-bottom-btns">
                                 <div class="btn-add-cart cursor-pointer" data-id="' . $productId . '" data-price="' . $productPrice . '" data-sku-id="' . $skuId . '">Add to cart
@@ -501,14 +501,14 @@ class Boot
                       </div>';
                 }
             }
-            
+
             $html .= '
                 </div>
                   </div>
                   <button class="slider-nav slider-prev" id="prev-' . $tabId . '"><i class="bi bi-chevron-left"></i></button>
                   <button class="slider-nav slider-next" id="next-' . $tabId . '"><i class="bi bi-chevron-right"></i></button>
                 </div>';
-                
+
             // 添加产品轮播的JavaScript
             $html .= '
                 <script>
@@ -518,24 +518,24 @@ class Boot
                   const items = slider.querySelectorAll(".product-slider-item");
                   const prevBtn = document.getElementById("prev-' . $tabId . '");
                   const nextBtn = document.getElementById("next-' . $tabId . '");
-                  
+
                   let currentPosition = 0;
                   const itemsPerView = 6;
                   const totalItems = items.length;
                   const maxPosition = Math.max(0, Math.ceil(totalItems / itemsPerView) - 1);
-                  
+
                   function updateSliderPosition() {
                     const translateX = -currentPosition * 100;
                     track.style.transform = `translateX(${translateX}%)`;
-                    
+
                     // 更新按钮状态
                     prevBtn.style.display = currentPosition <= 0 ? "none" : "flex";
                     nextBtn.style.display = currentPosition >= maxPosition ? "none" : "flex";
                   }
-                  
+
                   // 初始化按钮状态
                   updateSliderPosition();
-                  
+
                   // 添加事件监听器
                   prevBtn.addEventListener("click", function() {
                     if (currentPosition > 0) {
@@ -543,7 +543,7 @@ class Boot
                       updateSliderPosition();
                     }
                   });
-                  
+
                   nextBtn.addEventListener("click", function() {
                     if (currentPosition < maxPosition) {
                       currentPosition++;
@@ -552,11 +552,11 @@ class Boot
                   });
                 });
                 </script>';
-                
+
             $html .= '
               </div>';
         }
-        
+
         // 添加全局CSS样式
         $html .= '
         <style>
@@ -565,19 +565,19 @@ class Boot
             overflow: hidden;
             padding: 0 30px;
           }
-          
+
           .product-slider {
             position: relative;
             overflow: hidden;
           }
-          
+
           .product-slider-track {
             display: flex;
             flex-wrap: nowrap;
             transition: transform 0.5s ease;
             width: 100%;
           }
-          
+
           .product-slider-item {
             flex: 0 0 16.666%;
             padding: 0 10px;
@@ -593,7 +593,7 @@ class Boot
             height: auto;
             line-height: 1.4;
           }
-          
+
           .slider-nav {
             position: absolute;
             top: 50%;
@@ -609,22 +609,22 @@ class Boot
             cursor: pointer;
             z-index: 10;
           }
-          
+
           .slider-prev {
             left: 0;
           }
-          
+
           .slider-next {
             right: 0;
           }
-          
+
           @media (max-width: 767px) {
             .product-slider-item {
               flex: 0 0 33.333%;
             }
           }
         </style>';
-        
+
         return $html;
     }
 
@@ -643,24 +643,24 @@ class Boot
                     return $value[$locale];
                 }
             }
-            
+
             // 如果前端语言没有对应设置，尝试使用当前应用语言
             $appLocale = app()->getLocale();
             if (isset($value[$appLocale])) {
                 return $value[$appLocale];
             }
-            
+
             // 如果两者都没有，尝试使用英语
             if (isset($value['en'])) {
                 return $value['en'];
             }
-            
+
             // 如果英语也没有，返回数组的第一个元素
             if (!empty($value)) {
                 return reset($value);
             }
         }
-        
+
         // 如果不是数组或者没有找到合适的语言设置，直接返回原值
         return $value;
     }
