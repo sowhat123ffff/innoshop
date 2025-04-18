@@ -29,17 +29,17 @@ class Breadcrumb
     {
         if (in_array($type, ['category', 'product', 'tag'])) {
             return [
-                'title' => $object->fallbackName('name'),
+                'title' => strip_tags(str_replace(['&lt;br&gt;', '<br>'], ' ', $object->fallbackName('name'))),
                 'url'   => $object->url,
             ];
         } elseif (in_array($type, ['catalog', 'article', 'page'])) {
             return [
-                'title' => $object->fallbackName('title'),
+                'title' => strip_tags(str_replace(['&lt;br&gt;', '<br>'], ' ', $object->fallbackName('title'))),
                 'url'   => $object->url,
             ];
         } elseif ($type == 'brand') {
             return [
-                'title' => $object->name,
+                'title' => strip_tags(str_replace(['&lt;br&gt;', '<br>'], ' ', $object->name)),
                 'url'   => $object->url,
             ];
         } elseif ($type == 'order') {
