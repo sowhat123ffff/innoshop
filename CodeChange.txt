@@ -1,0 +1,9 @@
+        $bestSeller  = ProductRepo::getInstance()->getBestSellerProducts(32);
+        $tabProducts = [
+            ['tab_title' => 'All Product', 'products' => $bestSeller],
+        ];
+
+C:\xampp3\htdocs\innoshop\innopacks\front\src\Controllers\HomeController.php
+
+Header Menu更换
+C:\xampp3\htdocs\innoshop\themes\default\views\layouts\header.blade.php

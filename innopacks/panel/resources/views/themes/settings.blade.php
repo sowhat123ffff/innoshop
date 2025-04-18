@@ -22,6 +22,7 @@
                  data-bs-target="#tab-setting-header-menu">{{ __('panel/setting.header_menu') }}</a>
               <a class="nav-link" href="#" data-bs-toggle="tab"
                  data-bs-target="#tab-setting-footer-menu">{{ __('panel/setting.footer_menu') }}</a>
+              @hookinsert('themes.settings.nav')
             </ul>
           </div>
         </div>
@@ -225,6 +226,8 @@
                   </div>
                 </div>
               </div>
+              
+              @hookinsert('themes.settings.tabs')
             </div>
           </div>
         </div>

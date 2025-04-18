@@ -42,7 +42,7 @@
             </td>
             <td>
               <a href="{{ $product->url }}" class="text-decoration-none" target="_blank" data-bs-toggle="tooltip" title="{{ $product->fallbackName() }}">
-                {{ sub_string($product->fallbackName(),28) }}
+                {!! str_replace(['&lt;br&gt;', '<br>'], '<br>', e(sub_string($product->fallbackName(),28))) !!}
               </a>
               @if($product->isMultiple()) &nbsp;<span class="text-bg-success px-1">M</span>@endif
             </td>

@@ -22,11 +22,9 @@ class HomeController extends Controller
      */
     public function index(): mixed
     {
-        $bestSeller  = ProductRepo::getInstance()->getBestSellerProducts();
-        $newArrivals = ProductRepo::getInstance()->getLatestProducts();
+        $bestSeller  = ProductRepo::getInstance()->getBestSellerProducts(32);
         $tabProducts = [
-            ['tab_title' => trans('front/home.bestseller'), 'products' => $bestSeller],
-            ['tab_title' => trans('front/home.new_arrival'), 'products' => $newArrivals],
+            ['tab_title' => 'All Product', 'products' => $bestSeller],
         ];
 
         $news = ArticleRepo::getInstance()->getLatestArticles();
