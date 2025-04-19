@@ -262,15 +262,68 @@
                   }
                 }
 
-                // Check order comment for JSON data
-                if ($order->comment && is_string($order->comment)) {
+                // Check for custom_data field in the order
+                if (isset($order->custom_data) && !empty($order->custom_data)) {
+                  try {
+                    $customDataJson = json_decode($order->custom_data, true);
+                    if (isset($customDataJson['panel_order_custom_information'])) {
+                      $customData = array_merge($customData, $customDataJson['panel_order_custom_information']);
+                    } else {
+                      $customData = array_merge($customData, $customDataJson);
+                    }
+                  } catch (\Exception $e) {
+                    // Invalid JSON, ignore
+                  }
+                }
+
+                // Parse custom information from order comment as fallback
+                if (empty($customData) && $order->comment && is_string($order->comment)) {
+                  // First try JSON
                   try {
                     $commentData = json_decode($order->comment, true);
                     if (is_array($commentData)) {
                       $customData = array_merge($customData, $commentData);
                     }
                   } catch (\Exception $e) {
-                    // Not valid JSON, ignore
+                    // Not valid JSON, try parsing manually
+                  }
+
+                  // If we have a custom information section in the comment
+                  if (strpos($order->comment, '=== CUSTOM INFORMATION ===') !== false) {
+                    $parts = explode('=== CUSTOM INFORMATION ===', $order->comment);
+                    if (isset($parts[1])) {
+                      $customInfoText = trim($parts[1]);
+                      $lines = preg_split('/\r\n|\r|\n/', $customInfoText);
+
+                      foreach ($lines as $line) {
+                        $line = trim($line);
+                        if (empty($line)) continue;
+
+                        // Extract field and value
+                        if (strpos($line, ':') !== false) {
+                          list($field, $value) = explode(':', $line, 2);
+                          $field = trim($field);
+                          $value = trim($value);
+
+                          // Map fields to our expected keys
+                          if (strpos($field, '姓名 Name') !== false) {
+                            $customData['customerName'] = $value;
+                          } else if (strpos($field, '性别 Gender') !== false) {
+                            $customData['customerGender'] = $value;
+                          } else if (strpos($field, '阳历生日') !== false || strpos($field, 'Date of Birth (Solar)') !== false) {
+                            $customData['customerDOB'] = $value;
+                          } else if (strpos($field, '农历生日') !== false || strpos($field, 'Date of Birth (Lunar)') !== false) {
+                            $customData['customerLunarDOB'] = $value;
+                          } else if (strpos($field, '生肖') !== false || strpos($field, 'Chinese Zodiac') !== false) {
+                            $customData['customerZodiac'] = $value;
+                          } else if (strpos($field, '出生时间') !== false || strpos($field, 'Time of Birth') !== false) {
+                            $customData['customerTimeOfBirth'] = $value;
+                          } else if (strpos($field, '联络号码') !== false || strpos($field, 'WhatsApp') !== false) {
+                            $customData['customerWhatsApp'] = $value;
+                          }
+                        }
+                      }
+                    }
                   }
                 }
 

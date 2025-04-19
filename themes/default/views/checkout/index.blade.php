@@ -249,6 +249,7 @@
           shipping_method_code: @json($checkout['shipping_method_code'] ?? ''),
           billing_method_code: @json($checkout['billing_method_code'] ?? ''),
           comment: '',
+          custom_data: '',
           customData: localStorage.getItem('customFormData') || ''
         })
 
@@ -327,7 +328,23 @@
               // Parse the custom form data
               const customData = JSON.parse(customFormData);
 
-              // Add custom data to the comment field
+              // Create a structured format for the custom data
+              const customInfoObj = {
+                panel_order_custom_information: {
+                  customerName: customData.customerName || '',
+                  customerGender: customData.customerGender || '',
+                  customerDOB: customData.customerDOB || '',
+                  customerLunarDOB: customData.customerLunarDOB || '',
+                  customerZodiac: customData.customerZodiac || '',
+                  customerTimeOfBirth: customData.customerTimeOfBirth || '',
+                  customerWhatsApp: customData.customerWhatsApp || ''
+                }
+              };
+
+              // Add the structured data as JSON to a hidden field
+              current.custom_data = JSON.stringify(customInfoObj);
+
+              // Also add to comment for backward compatibility
               if (current.comment) {
                 current.comment += '\n\n=== CUSTOM INFORMATION ===\n\n';
               } else {
