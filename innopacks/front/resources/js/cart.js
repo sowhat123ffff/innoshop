@@ -162,7 +162,7 @@ function updateCartOffcanvasContent(data) {
           </div>
           <div class="cart-item-details ms-3">
             <div class="cart-item-name">
-              <a href="${product.url}">${product.product_name}</a>
+              <a href="${product.url}"><div>${product.product_name}</div></a>
             </div>
             <div class="text-secondary mt-1">
               ${product.sku_code}

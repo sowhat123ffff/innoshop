@@ -52,7 +52,7 @@
                     <div class="product-item">
                       <div class="product-info">
                         <div class="product-name">
-                          <a href="{{ $product['url'] }}">{{ $product['product_name'] }}</a>
+                          <a href="{{ $product['url'] }}">{!! $product['product_name'] !!}</a>
                           <div class="text-secondary mt-1">
                             {{ $product['sku_code'] }}
                             @if ($product['variant_label'])

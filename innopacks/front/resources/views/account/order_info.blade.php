@@ -71,8 +71,8 @@
                         <img src="{{ $product['image'] }}" class="img-fluid">
                       </div>
                       <div class="product-info">
-                        <div class="name" data-bs-toggle="tooltip" title="{{ $product['name'] }}">
-                          {{ sub_string($product['name'], 64) }}
+                        <div class="name">
+                          {!! $product['name'] !!}
                         </div>
                         <div class="sku mt-2 text-secondary">{{ $product['product_sku'] }}
                           @if ($product['variant_label'])

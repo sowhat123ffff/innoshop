@@ -11,9 +11,8 @@
     </div>
     <div class="product-item-info">
       <div class="product-name">
-        <a href="{{ $product->url }}" data-bs-toggle="tooltip" title="{{ $product->fallbackName() }}"
-           data-placement="top">
-          {{ $product->fallbackName() }}
+        <a href="{{ $product->url }}">
+          {!! $product->fallbackName() !!}
         </a>
       </div>
 

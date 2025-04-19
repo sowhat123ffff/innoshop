@@ -58,7 +58,7 @@
                       <img src="{{ $product['image'] }}" class="img-fluid">
                     </div>
                     <div class="product-info">
-                      <div class="name">{{ $product['name'] }}</div>
+                      <div class="name">{!! $product['name'] !!}</div>
                       <div class="sku mt-2 text-secondary">{{ $product['product_sku'] }}
                         @if ($product['variant_label'])
                           - {{ $product['variant_label'] }}
