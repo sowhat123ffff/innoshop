@@ -74,6 +74,10 @@
                       __('panel/common.delete')}}</el-button>
                   </form>
                 </div>
+                <div class="d-flex align-items-center">
+                  <span class="me-2">@include('panel::shared.list_switch', ['value' => $product->custom_enabled ?? false, 'url' => panel_route('products.custom', $product->id)])</span>
+                  <el-button size="small" plain type="info">Custom</el-button>
+                </div>
               </div>
             </td>
           </tr>

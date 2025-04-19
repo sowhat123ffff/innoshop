@@ -26,6 +26,26 @@ use Throwable;
 class ProductController extends BaseController
 {
     /**
+     * Toggle the custom_enabled status for a product
+     *
+     * @param  Request  $request
+     * @param  int  $id
+     * @return mixed
+     * @throws Exception
+     */
+    public function customToggle(Request $request, int $id): mixed
+    {
+        try {
+            $product = Product::query()->findOrFail($id);
+            $product->custom_enabled = $request->get('status');
+            $product->saveOrFail();
+
+            return json_success(panel_trans('common.updated_success'));
+        } catch (Exception $e) {
+            return json_fail($e->getMessage());
+        }
+    }
+    /**
      * @param  Request  $request
      * @return mixed
      * @throws Exception

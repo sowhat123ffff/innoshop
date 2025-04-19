@@ -249,6 +249,7 @@
           shipping_method_code: @json($checkout['shipping_method_code'] ?? ''),
           billing_method_code: @json($checkout['billing_method_code'] ?? ''),
           comment: '',
+          customData: localStorage.getItem('customFormData') || ''
         })
 
         const isCheckout = computed(() => {
@@ -318,8 +319,39 @@
           layer.load(2, {
             shade: [0.3, '#fff']
           })
+
+          // Get custom form data from localStorage
+          const customFormData = localStorage.getItem('customFormData');
+          if (customFormData) {
+            try {
+              // Parse the custom form data
+              const customData = JSON.parse(customFormData);
+
+              // Add custom data to the comment field
+              if (current.comment) {
+                current.comment += '\n\n=== CUSTOM INFORMATION ===\n\n';
+              } else {
+                current.comment = '=== CUSTOM INFORMATION ===\n\n';
+              }
+
+              // Add each custom field to the comment with proper formatting - each on its own line with spacing
+              if (customData.customerName) current.comment += '姓名 Name: ' + customData.customerName + '\n\n';
+              if (customData.customerGender) current.comment += '性别 Gender: ' + customData.customerGender + '\n\n';
+              if (customData.customerDOB) current.comment += '阳历生日 Date of Birth (Solar): ' + customData.customerDOB + '\n\n';
+              if (customData.customerLunarDOB) current.comment += '农历生日 Date of Birth (Lunar): ' + customData.customerLunarDOB + '\n\n';
+              if (customData.customerZodiac) current.comment += '生肖 Chinese Zodiac: ' + customData.customerZodiac + '\n\n';
+              if (customData.customerTimeOfBirth) current.comment += '出生时间 Time of Birth: ' + customData.customerTimeOfBirth + '\n\n';
+              if (customData.customerWhatsApp) current.comment += '联络号码 WhatsApp: ' + customData.customerWhatsApp;
+            } catch (e) {
+              console.error('Error parsing custom form data:', e);
+            }
+          }
+
           axios.post(api.checkoutConfirm, current).then(function(res) {
             if (res.success) {
+              // Clear the custom form data from localStorage after successful checkout
+              localStorage.removeItem('customFormData');
+
               layer.msg(res.message, {
                 time: 1000
               }, function() {

@@ -180,11 +180,11 @@
         <div class="row">
           <div class="col-12 col-md-6 mb-4">
             <h6 class="fs-5">{{ __('panel/order.customer_remarks') }}</h6>
-            <p class="mb-0">{{ $order->comment }}</p>
+            <div class="mb-0 p-3 bg-light rounded">{!! nl2br(e($order->comment)) !!}</div>
           </div>
           <div class="col-12 col-md-6 mb-3">
             <h6 class="fs-5">{{ __('panel/order.administrator_remarks') }}</h6>
-            <p class="mb-0">{{ $order->admin_note }}</p>
+            <div class="mb-0 p-3 bg-light rounded">{!! nl2br(e($order->admin_note)) !!}</div>
             <button class="btn btn-sm btn-primary mt-2" data-bs-toggle="modal">
               {{ __('panel/common.edit') }}
             </button>
@@ -215,6 +215,199 @@
   </div>
 
   @hookinsert('panel.orders.info.comment.after')
+
+  <div class="card mb-4">
+    <div class="card-header bg-light">
+      <h5 class="card-title mb-0"><i class="bi bi-person-vcard me-2"></i>{{ __('panel/order.custom_information') ?? 'Custom Information' }}</h5>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-12">
+          <table class="table table-bordered table-hover">
+            <thead class="table-light">
+              <tr>
+                <th width="30%">Field</th>
+                <th width="70%">Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              @php
+                // Get custom data from order items
+                $customData = [];
+
+                // Check if the order has items with custom data
+                foreach ($order->items as $item) {
+                  // Try to extract custom data from the item name
+                  if (strpos($item->name, 'customerName:') !== false) {
+                    // The custom data might be embedded in the item name
+                    $nameParts = explode('\n', $item->name);
+                    foreach ($nameParts as $part) {
+                      if (strpos($part, ':') !== false) {
+                        list($key, $value) = explode(':', $part, 2);
+                        $customData[trim($key)] = trim($value);
+                      }
+                    }
+                  }
+
+                  // Check if the item has a reference field
+                  if (isset($item->reference) && is_array($item->reference)) {
+                    $customData = array_merge($customData, $item->reference);
+                  }
+                }
+
+                // Check order fees for custom data
+                foreach ($order->fees as $fee) {
+                  if (isset($fee->reference) && is_array($fee->reference)) {
+                    $customData = array_merge($customData, $fee->reference);
+                  }
+                }
+
+                // Check order comment for JSON data
+                if ($order->comment && is_string($order->comment)) {
+                  try {
+                    $commentData = json_decode($order->comment, true);
+                    if (is_array($commentData)) {
+                      $customData = array_merge($customData, $commentData);
+                    }
+                  } catch (\Exception $e) {
+                    // Not valid JSON, ignore
+                  }
+                }
+
+                // If no custom data found, try to extract from the first item's name
+                if (empty($customData) && count($order->items) > 0) {
+                  $firstItem = $order->items->first();
+                  $customData = [
+                    'itemName' => $firstItem->name,
+                    'itemSku' => $firstItem->product_sku,
+                    'itemVariant' => $firstItem->variant_label,
+                  ];
+                }
+              @endphp
+
+              @if (!empty($customData['customerName']))
+                <tr>
+                  <td class="fw-medium"><i class="bi bi-person me-2"></i>姓名 Name</td>
+                  <td>{{ $customData['customerName'] }}</td>
+                </tr>
+              @endif
+
+              @if (!empty($customData['customerGender']))
+                <tr>
+                  <td class="fw-medium"><i class="bi bi-gender-ambiguous me-2"></i>性别 Gender</td>
+                  <td>
+                    @if(strtolower($customData['customerGender']) == 'male')
+                      <span class="badge bg-primary">Male 男</span>
+                    @elseif(strtolower($customData['customerGender']) == 'female')
+                      <span class="badge bg-danger">Female 女</span>
+                    @else
+                      {{ $customData['customerGender'] }}
+                    @endif
+                  </td>
+                </tr>
+              @endif
+
+              @if (!empty($customData['customerDOB']))
+                <tr>
+                  <td class="fw-medium"><i class="bi bi-calendar-date me-2"></i>阳历生日 Date of Birth (Solar)</td>
+                  <td>{{ $customData['customerDOB'] }}</td>
+                </tr>
+              @endif
+
+              @if (!empty($customData['customerLunarDOB']))
+                <tr>
+                  <td class="fw-medium"><i class="bi bi-calendar-heart me-2"></i>农历生日 Date of Birth (Lunar)</td>
+                  <td>{{ $customData['customerLunarDOB'] }}</td>
+                </tr>
+              @endif
+
+              @if (!empty($customData['customerZodiac']))
+                <tr>
+                  <td class="fw-medium"><i class="bi bi-stars me-2"></i>生肖 Chinese Zodiac</td>
+                  <td>
+                    <span class="badge bg-secondary">{{ $customData['customerZodiac'] }}</span>
+                  </td>
+                </tr>
+              @endif
+
+              @if (!empty($customData['customerTimeOfBirth']))
+                <tr>
+                  <td class="fw-medium"><i class="bi bi-clock-history me-2"></i>出生时间 Time of Birth</td>
+                  <td>{{ $customData['customerTimeOfBirth'] }}</td>
+                </tr>
+              @endif
+
+              @if (!empty($customData['customerWhatsApp']))
+                <tr>
+                  <td class="fw-medium"><i class="bi bi-whatsapp me-2"></i>联络号码 WhatsApp</td>
+                  <td>
+                    <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $customData['customerWhatsApp']) }}" target="_blank" class="text-decoration-none">
+                      {{ $customData['customerWhatsApp'] }} <i class="bi bi-box-arrow-up-right ms-1 small"></i>
+                    </a>
+                  </td>
+                </tr>
+              @endif
+
+              @if (empty($customData['customerName']) && empty($customData['customerGender']) && empty($customData['customerDOB']) && empty($customData['customerLunarDOB']) && empty($customData['customerZodiac']) && empty($customData['customerTimeOfBirth']) && empty($customData['customerWhatsApp']))
+                <tr>
+                  <td colspan="2" class="text-center">No custom information available</td>
+                </tr>
+
+                @if(auth()->user() && auth()->user()->hasRole('admin'))
+                <!-- Debug section to show all available data (only visible to admins) -->
+                <tr>
+                  <td colspan="2">
+                    <div class="mt-3">
+                      <h6 class="text-muted"><i class="bi bi-bug me-2"></i>Technical Information (Admin Only)</h6>
+                      <div class="accordion accordion-flush" id="debugAccordion">
+                        <div class="accordion-item">
+                          <h2 class="accordion-header" id="headingOne">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                              <i class="bi bi-box-seam me-2"></i>Order Items Data
+                            </button>
+                          </h2>
+                          <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#debugAccordion">
+                            <div class="accordion-body bg-light">
+                              <pre class="mb-0" style="max-height: 300px; overflow: auto;">{{ json_encode($order->items, JSON_PRETTY_PRINT) }}</pre>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="accordion-item">
+                          <h2 class="accordion-header" id="headingTwo">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                              <i class="bi bi-chat-square-text me-2"></i>Order Comment
+                            </button>
+                          </h2>
+                          <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#debugAccordion">
+                            <div class="accordion-body bg-light">
+                              <pre class="mb-0" style="max-height: 300px; overflow: auto;">{{ $order->comment }}</pre>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="accordion-item">
+                          <h2 class="accordion-header" id="headingThree">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                              <i class="bi bi-cash-coin me-2"></i>Order Fees Data
+                            </button>
+                          </h2>
+                          <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#debugAccordion">
+                            <div class="accordion-body bg-light">
+                              <pre class="mb-0" style="max-height: 300px; overflow: auto;">{{ json_encode($order->fees, JSON_PRETTY_PRINT) }}</pre>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                @endif
+              @endif
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <div class="card mb-4">
     <div class="card-header d-flex justify-content-between align-items-center">
@@ -321,8 +514,12 @@
             <div class="mb-3">
               <label for="logisticsCompany" class="form-label">{{ __('panel/order.express_company') }}</label>
               <select class="form-control" id="logisticsCompany">
-                @foreach(system_setting('logistics', []) as $expressCompany)
-                  <option value="{{ $expressCompany['code'] }}">{{ $expressCompany['company'] }}</option>
+                @php
+                  $logistics = system_setting('logistics', []);
+                  $logisticsArray = is_array($logistics) ? $logistics : [];
+                @endphp
+                @foreach($logisticsArray as $expressCompany)
+                  <option value="{{ $expressCompany['code'] ?? '' }}">{{ $expressCompany['company'] ?? '' }}</option>
                 @endforeach
               </select>
             </div>

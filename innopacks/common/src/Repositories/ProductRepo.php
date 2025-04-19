@@ -317,10 +317,11 @@ class ProductRepo extends BaseRepo
             'position'     => (int) ($data['position'] ?? 0),
             'weight'       => $data['weight']       ?? 0,
             'weight_class' => $data['weight_class'] ?? '',
-            'sales'        => (int) ($data['sales'] ?? 0),
-            'viewed'       => (int) ($data['viewed'] ?? 0),
-            'published_at' => $data['published_at'] ?? now(),
-            'active'       => (bool) ($data['active'] ?? true),
+            'sales'          => (int) ($data['sales'] ?? 0),
+            'viewed'         => (int) ($data['viewed'] ?? 0),
+            'published_at'   => $data['published_at'] ?? now(),
+            'active'         => (bool) ($data['active'] ?? true),
+            'custom_enabled' => (bool) ($data['custom_enabled'] ?? false),
         ];
     }
 

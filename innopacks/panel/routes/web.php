@@ -35,6 +35,7 @@ Route::middleware(['admin_auth:admin'])
 
         Route::resource('/products', Controllers\ProductController::class);
         Route::put('/products/{product}/active', [Controllers\ProductController::class, 'active'])->name('products.active');
+        Route::put('/products/{product}/custom', [Controllers\ProductController::class, 'customToggle'])->name('products.custom');
         Route::get('/products/{product}/copy', [Controllers\ProductController::class, 'copy'])->name('products.copy');
 
         Route::resource('/categories', Controllers\CategoryController::class);

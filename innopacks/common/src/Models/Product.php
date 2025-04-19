@@ -29,14 +29,15 @@ class Product extends BaseModel
 
     protected $fillable = [
         'brand_id', 'images', 'price', 'tax_class_id', 'spu_code', 'slug', 'is_virtual', 'variables', 'position',
-        'spu_code', 'active', 'weight', 'weight_class', 'sales', 'viewed',
+        'spu_code', 'active', 'custom_enabled', 'weight', 'weight_class', 'sales', 'viewed',
     ];
 
     protected $casts = [
-        'variables'  => 'array',
-        'images'     => 'array',
-        'active'     => 'boolean',
-        'is_virtual' => 'boolean',
+        'variables'      => 'array',
+        'images'         => 'array',
+        'active'         => 'boolean',
+        'custom_enabled' => 'boolean',
+        'is_virtual'     => 'boolean',
     ];
 
     protected $appends = ['image'];
