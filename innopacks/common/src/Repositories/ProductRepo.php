@@ -534,6 +534,14 @@ class ProductRepo extends BaseRepo
             });
         }
 
+        // Filter for in-stock products only
+        $inStock = $filters['in_stock'] ?? false;
+        if ($inStock) {
+            $builder->whereHas('masterSku', function (Builder $query) {
+                $query->where('quantity', '>', 0);
+            });
+        }
+
         return fire_hook_filter('repo.product.builder', $builder);
     }
 

@@ -96,11 +96,76 @@
       filterProductData();
     });
 
+    // Add event listeners for filter buttons and sliders
+    $(document).ready(function() {
+      $('#apply-filter-btn').on('click', function() {
+        filterProductData();
+      });
+
+      $('#reset-filter-btn').on('click', function() {
+        resetFilters();
+      });
+
+      // Price range slider functionality
+      const priceMinSlider = document.getElementById('price-min-slider');
+      const priceMaxSlider = document.getElementById('price-max-slider');
+      const priceMinInput = document.getElementById('price-min-input');
+      const priceMaxInput = document.getElementById('price-max-input');
+
+      if (priceMinSlider && priceMaxSlider) {
+        // Update the price input when sliders change
+        priceMinSlider.addEventListener('input', function() {
+          // Ensure min doesn't exceed max
+          if (parseInt(this.value) > parseInt(priceMaxSlider.value)) {
+            this.value = priceMaxSlider.value;
+          }
+          priceMinInput.value = this.value;
+          updateSliderTrack();
+        });
+
+        priceMaxSlider.addEventListener('input', function() {
+          // Ensure max doesn't go below min
+          if (parseInt(this.value) < parseInt(priceMinSlider.value)) {
+            this.value = priceMinSlider.value;
+          }
+          priceMaxInput.value = this.value;
+          updateSliderTrack();
+        });
+
+        // Update the sliders when inputs change
+        priceMinInput.addEventListener('change', function() {
+          // Ensure min doesn't exceed max
+          if (parseInt(this.value) > parseInt(priceMaxInput.value)) {
+            this.value = priceMaxInput.value;
+          }
+          priceMinSlider.value = this.value;
+          updateSliderTrack();
+        });
+
+        priceMaxInput.addEventListener('change', function() {
+          // Ensure max doesn't go below min
+          if (parseInt(this.value) < parseInt(priceMinInput.value)) {
+            this.value = priceMinInput.value;
+          }
+          priceMaxSlider.value = this.value;
+          updateSliderTrack();
+        });
+
+        // Initialize slider track
+        updateSliderTrack();
+      }
+    });
+
     function filterProductData() {
-      let url = inno.removeURLParameters(window.location.href, 'price', 'sort', 'order');
+      let url = inno.removeURLParameters(window.location.href, 'price_start', 'price_end', 'in_stock', 'sort', 'order');
       let order = $('.order-select').val();
       let perPage = $('.per-page-select').val();
       let styleList = $('input[name="style_list"]:checked').val();
+
+      // Get price filter values
+      const priceMinInput = document.getElementById('price-min-input');
+      const priceMaxInput = document.getElementById('price-max-input');
+      const inStockCheckbox = document.getElementById('in-stock-checkbox');
 
       layer.load(2, {shade: [0.3, '#fff']})
 
@@ -118,7 +183,62 @@
         url = inno.updateQueryStringParameter(url, 'style_list', styleList);
       }
 
+      // Add price filter parameters
+      if (priceMinInput && parseInt(priceMinInput.value) > 0) {
+        url = inno.updateQueryStringParameter(url, 'price_start', priceMinInput.value);
+      }
+
+      if (priceMaxInput && parseInt(priceMaxInput.value) < parseInt(priceMaxInput.max)) {
+        url = inno.updateQueryStringParameter(url, 'price_end', priceMaxInput.value);
+      }
+
+      // Add in-stock filter parameter
+      if (inStockCheckbox && inStockCheckbox.checked) {
+        url = inno.updateQueryStringParameter(url, 'in_stock', '1');
+      }
+
       location = url;
+    }
+
+    function updateSliderTrack() {
+      const priceMinSlider = document.getElementById('price-min-slider');
+      const priceMaxSlider = document.getElementById('price-max-slider');
+
+      if (priceMinSlider && priceMaxSlider) {
+        const minVal = parseInt(priceMinSlider.value);
+        const maxVal = parseInt(priceMaxSlider.value);
+        const minPercent = (minVal / priceMinSlider.max) * 100;
+        const maxPercent = (maxVal / priceMaxSlider.max) * 100;
+
+        priceMinSlider.style.setProperty('--lower-fill', `${minPercent}%`);
+        priceMaxSlider.style.setProperty('--upper-fill', `${maxPercent}%`);
+      }
+    }
+
+    function resetFilters() {
+      const priceMinSlider = document.getElementById('price-min-slider');
+      const priceMaxSlider = document.getElementById('price-max-slider');
+      const priceMinInput = document.getElementById('price-min-input');
+      const priceMaxInput = document.getElementById('price-max-input');
+      const inStockCheckbox = document.getElementById('in-stock-checkbox');
+
+      if (priceMinSlider) {
+        priceMinSlider.value = 0;
+        if (priceMinInput) priceMinInput.value = 0;
+      }
+
+      if (priceMaxSlider) {
+        priceMaxSlider.value = priceMaxSlider.max;
+        if (priceMaxInput) priceMaxInput.value = priceMaxSlider.max;
+      }
+
+      if (inStockCheckbox) inStockCheckbox.checked = false;
+
+      updateSliderTrack();
+
+      // Remove all filter parameters from URL
+      let url = inno.removeURLParameters(window.location.href, 'price_start', 'price_end', 'in_stock');
+      window.location.href = url;
     }
 
     function filterAttrChecked(data) {
