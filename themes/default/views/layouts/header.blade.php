@@ -53,10 +53,10 @@
         <div class="menu">
           <nav class="navbar navbar-expand-md navbar-light">
             <ul class="navbar-nav">
-              <li class="nav-item">
+              <!--<li class="nav-item">
                 <a class="nav-link" aria-current="page"
                    href="{{ front_route('home.index') }}">{{ __('front/common.home') }}</a>
-              </li>
+              </li>-->
 
               @hookupdate('layouts.header.menu.pc')
               @foreach ($header_menus as $menu)
@@ -67,17 +67,25 @@
                         <a class="nav-link {{ equal_url($menu['url']) ? 'active' : '' }}"
                            href="{{ $menu['url'] }}">{{ $menu['name'] }}</a>
                         <a href="{{ $menu['url'] }}" class="menu-subtitle-link">
-                          @if ($menu['name'] === 'Products')
-                            产品副标题
-                          @elseif ($menu['name'] === 'Home')
-                            首页副标题
-                          @elseif ($menu['name'] === 'About')
-                            关于副标题
-                            @elseif ($menu['name'] === '法会')
-                            Praying
-                          @else
-                            默认副标题
-                          @endif
+                        @if ($menu['name'] === '开运饰品')
+                          Fortune<br>Accessories
+                        @elseif ($menu['name'] === '代烧')
+                          Burn On<br>Behalf
+                        @elseif ($menu['name'] === '风水产品')
+                          Feng Shui<br>Products
+                        @elseif ($menu['name'] === '法会')
+                          Praying<br>Ceremony
+                        @elseif ($menu['name'] === '神料')
+                          Praying<br>Supplies
+                        @elseif ($menu['name'] === '风水服务')
+                          Feng Shui<br>Services
+                        @elseif ($menu['name'] === '风水资讯')
+                          Feng Shui<br>Info
+                        @elseif ($menu['name'] === '关于我们')
+                          About<br>Us
+                        @else
+                          Default<br>Subtitle
+                        @endif
                         </a>
                       @endif
                       <ul class="dropdown-menu">
@@ -95,16 +103,24 @@
                       <a class="nav-link {{ equal_url($menu['url']) ? 'active' : '' }}"
                          href="{{ $menu['url'] }}">{{ $menu['name'] }}</a>
                       <a href="{{ $menu['url'] }}" class="menu-subtitle-link">
-                        @if ($menu['name'] === 'Products')
-                          产品副标题
-                        @elseif ($menu['name'] === 'Home')
-                          首页副标题
-                        @elseif ($menu['name'] === 'About')
-                          关于副标题
-                          @elseif ($menu['name'] === '法会')
-                          Praying<br>CEREMONY
+                        @if ($menu['name'] === '开运饰品')
+                          Fortune<br>Accessories
+                        @elseif ($menu['name'] === '代烧')
+                          Burn On<br>Behalf
+                        @elseif ($menu['name'] === '风水产品')
+                          Feng Shui<br>Products
+                        @elseif ($menu['name'] === '法会')
+                          Praying<br>Ceremony
+                        @elseif ($menu['name'] === '神料')
+                          Praying<br>Supplies
+                        @elseif ($menu['name'] === '风水服务')
+                          Feng Shui<br>Services
+                        @elseif ($menu['name'] === '风水资讯')
+                          Feng Shui<br>Info
+                        @elseif ($menu['name'] === '关于我们')
+                          About<br>Us
                         @else
-                          默认副标题
+                          Default<br>Subtitle
                         @endif
                       </a>
                     </li>
@@ -117,11 +133,17 @@
         </div>
       </div>
       <div class="right">
-        <form action="{{ front_route('products.index') }}" method="get" class="search-group">
-          <input type="text" class="form-control" name="keyword" placeholder="{{ __('front/common.search') }}"
-                 value="{{ request('keyword') }}">
-          <button type="submit" class="btn"><i class="bi bi-search"></i></button>
-        </form>
+        <div class="search-icon-container">
+          <a href="javascript:void(0)" class="search-icon"><i class="bi bi-search"></i></a>
+          <div class="popup-search-box">
+            <form action="{{ front_route('products.index') }}" method="get" class="search-group">
+              <input type="text" class="form-control" name="keyword" placeholder="{{ __('front/common.search') }}"
+                     value="{{ request('keyword') }}">
+              <button type="submit" class="btn"><i class="bi bi-search"></i></button>
+              <button type="button" class="btn-close-search"><i class="bi bi-x"></i></button>
+            </form>
+          </div>
+        </div>
         <div class="icons">
           <div class="item">
             <div class="dropdown account-icon">
@@ -181,10 +203,17 @@
 
     <div class="offcanvas offcanvas-start" tabindex="-1" id="mobile-menu-offcanvas">
       <div class="offcanvas-header">
-        <form action="" method="get" class="search-group">
-          <input type="text" class="form-control" placeholder="Search">
-          <button type="submit" class="btn"><i class="bi bi-search"></i></button>
-        </form>
+        <div class="search-icon-container mobile">
+          <a href="javascript:void(0)" class="search-icon"><i class="bi bi-search"></i></a>
+          <div class="popup-search-box">
+            <form action="{{ front_route('products.index') }}" method="get" class="search-group">
+              <input type="text" class="form-control" name="keyword" placeholder="{{ __('front/common.search') }}"
+                     value="{{ request('keyword') }}">
+              <button type="submit" class="btn"><i class="bi bi-search"></i></button>
+              <button type="button" class="btn-close-search"><i class="bi bi-x"></i></button>
+            </form>
+          </div>
+        </div>
         <a class="account-icon" href="{{ front_route('account.index') }}">
           <img src="{{ asset('images/icons/account.svg') }}" class="img-fluid">
         </a>
@@ -292,6 +321,137 @@
     right: auto;
   }
   .navbar-nav .nav-item {
-    margin: 0 14px;
+    margin: 0 7px;
+  }
+
+  /* Search icon and popup styles */
+  .search-icon-container {
+    position: relative;
+    display: inline-block;
+  }
+
+  .search-icon {
+    font-size: 22px;
+    color: #333;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #F1F3F5;
+    transition: all 0.3s ease;
+  }
+
+  .search-icon:hover {
+    background-color: #e9ecef;
+  }
+
+  .popup-search-box {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 300px;
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    padding: 10px;
+    z-index: 1000;
+    display: none;
+    margin-top: 10px;
+  }
+
+  .popup-search-box:before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    right: 15px;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 8px solid #fff;
+  }
+
+  .popup-search-box .search-group {
+    width: 100%;
+    background-color: #F1F3F5;
+    border-radius: 4px;
+    position: relative;
+  }
+
+  .popup-search-box .search-group input {
+    width: 100%;
+    padding-right: 70px;
+  }
+
+  .btn-close-search {
+    position: absolute;
+    right: 40px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #999;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .btn-close-search:hover {
+    color: #333;
+  }
+
+  /* Mobile search styles */
+  .search-icon-container.mobile .popup-search-box {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
+    width: 100%;
+    margin-top: 0;
+    border-radius: 0;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  }
+
+  .search-icon-container.mobile .popup-search-box:before {
+    display: none;
   }
 </style>
+
+@push('footer')
+<script>
+  $(function() {
+    // Toggle search popup when search icon is clicked
+    $('.search-icon').on('click', function(e) {
+      e.preventDefault();
+      $(this).siblings('.popup-search-box').fadeToggle(200);
+      $(this).siblings('.popup-search-box').find('input').focus();
+    });
+
+    // Close search popup when close button is clicked
+    $('.btn-close-search').on('click', function() {
+      $(this).closest('.popup-search-box').fadeOut(200);
+    });
+
+    // Close search popup when clicking outside
+    $(document).on('click', function(e) {
+      if (!$(e.target).closest('.search-icon-container').length) {
+        $('.popup-search-box').fadeOut(200);
+      }
+    });
+
+    // Handle Enter key press in search input
+    $('.popup-search-box input').on('keydown', function(e) {
+      if (e.keyCode === 13) {
+        $(this).closest('form').submit();
+      }
+    });
+  });
+</script>
+@endpush
