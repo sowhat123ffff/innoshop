@@ -6,7 +6,30 @@
         @foreach ($categories as $key => $category)
         <div class="accordion-item">
           <div class="accordion-title">
-            <a href="{{ $category['url'] }}" class="">{{ $category['name'] }}</a>
+            <div class="category-title-wrapper">
+              <a href="{{ $category['url'] }}" class="category-title {{ request()->url() == $category['url'] ? 'active' : '' }}">{{ $category['name'] }}</a>
+              <a href="{{ $category['url'] }}" class="category-subtitle-link {{ request()->url() == $category['url'] ? 'active' : '' }}">
+                @if ($category['name'] === '开运饰品')
+                  Fortune<br>Accessories
+                @elseif ($category['name'] === '代烧')
+                  Burn On<br>Behalf
+                @elseif ($category['name'] === '风水产品')
+                  Feng Shui<br>Products
+                @elseif ($category['name'] === '法会')
+                  Praying<br>Ceremony
+                @elseif ($category['name'] === '神料')
+                  Praying<br>Supplies
+                @elseif ($category['name'] === '风水服务')
+                  Feng Shui<br>Services
+                @elseif ($category['name'] === '风水资讯')
+                  Feng Shui<br>Info
+                @elseif ($category['name'] === '关于我们')
+                  About<br>Us
+                @else
+                  Category<br>Subtitle
+                @endif
+              </a>
+            </div>
             @if ($category['children'])
             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#filter-collapse-{{ $key }}"></button>
             @endif
@@ -18,7 +41,30 @@
                 @foreach ($category['children'] as $child)
                 <div class="accordion-item">
                   <div class="accordion-title">
-                    <a href="{{ $child['url'] }}" class="">{{ $child['name'] }}</a>
+                    <div class="category-title-wrapper">
+                      <a href="{{ $child['url'] }}" class="category-title {{ request()->url() == $child['url'] ? 'active' : '' }}">{{ $child['name'] }}</a>
+                      <a href="{{ $child['url'] }}" class="category-subtitle-link subcategory {{ request()->url() == $child['url'] ? 'active' : '' }}">
+                        @if ($child['name'] === '开运饰品')
+                          Fortune<br>Accessories
+                        @elseif ($child['name'] === '代烧')
+                          Burn On<br>Behalf
+                        @elseif ($child['name'] === '风水产品')
+                          Feng Shui<br>Products
+                        @elseif ($child['name'] === '法会')
+                          Praying<br>Ceremony
+                        @elseif ($child['name'] === '神料')
+                          Praying<br>Supplies
+                        @elseif ($child['name'] === '风水服务')
+                          Feng Shui<br>Services
+                        @elseif ($child['name'] === '风水资讯')
+                          Feng Shui<br>Info
+                        @elseif ($child['name'] === '关于我们')
+                          About<br>Us
+                        @else
+                          Sub<br>Category
+                        @endif
+                      </a>
+                    </div>
                     @if (isset($child['children']) && $child['children'])
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#filter-collapse-{{ $key }}-{{ $loop->index }}"></button>
                     @endif
@@ -30,7 +76,30 @@
                         @foreach ($child['children'] as $subChild)
                         <div class="accordion-item">
                           <div class="accordion-title">
-                            <a href="{{ $subChild['url'] }}" class="">{{ $subChild['name'] }}</a>
+                            <div class="category-title-wrapper">
+                              <a href="{{ $subChild['url'] }}" class="category-title {{ request()->url() == $subChild['url'] ? 'active' : '' }}">{{ $subChild['name'] }}</a>
+                              <a href="{{ $subChild['url'] }}" class="category-subtitle-link subsubcategory {{ request()->url() == $subChild['url'] ? 'active' : '' }}">
+                                @if ($subChild['name'] === '开运饰品')
+                                  Fortune<br>Accessories
+                                @elseif ($subChild['name'] === '代烧')
+                                  Burn On<br>Behalf
+                                @elseif ($subChild['name'] === '风水产品')
+                                  Feng Shui<br>Products
+                                @elseif ($subChild['name'] === '法会')
+                                  Praying<br>Ceremony
+                                @elseif ($subChild['name'] === '神料')
+                                  Praying<br>Supplies
+                                @elseif ($subChild['name'] === '风水服务')
+                                  Feng Shui<br>Services
+                                @elseif ($subChild['name'] === '风水资讯')
+                                  Feng Shui<br>Info
+                                @elseif ($subChild['name'] === '关于我们')
+                                  About<br>Us
+                                @else
+                                  Sub<br>Item
+                                @endif
+                              </a>
+                            </div>
                           </div>
                         </div>
                         @endforeach
@@ -98,6 +167,108 @@
 
 @push('header')
 <style>
+  /* Category title and subtitle styles */
+  .category-title-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .category-title {
+    font-weight: bold;
+    text-decoration: none !important;
+    position: relative;
+    display: block;
+    width: 100%;
+    color: #333; /* Default color for non-selected categories */
+  }
+
+  .category-title.active,
+  .category-subtitle-link.active {
+    color: #E91E63 !important; /* Red color for selected category */
+    font-weight: bold;
+  }
+
+  /* Add a special class that we can apply with JavaScript */
+  .category-title.current-category,
+  .category-subtitle-link.current-category {
+    color: #E91E63 !important;
+    font-weight: bold;
+  }
+
+  .category-subtitle-link {
+    display: inline-block;
+    font-size: 12px;
+    color: #888;
+    margin-top: 0;
+    padding: 0;
+    text-decoration: none;
+    transition: color .3s;
+    position: relative;
+    line-height: 1.1;
+  }
+
+  .category-subtitle-link.subcategory {
+    font-size: 11px;
+  }
+
+  .category-subtitle-link.subsubcategory {
+    font-size: 10px;
+  }
+
+  .category-subtitle-link:after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -2px;
+    border-bottom: 2px solid #888;
+    width: 0;
+    transition: width .3s;
+  }
+
+  /* Hover styles for non-active items */
+  .category-title:not(.active):hover {
+    color: #555;
+  }
+
+  .category-subtitle-link:not(.active):hover,
+  .accordion-title:hover .category-subtitle-link:not(.active) {
+    color: #555;
+  }
+
+  /* Underline effect for hover and active states */
+  .category-subtitle-link:hover:after,
+  .accordion-title:hover .category-subtitle-link:after,
+  .category-subtitle-link.active:after {
+    width: 100%;
+    left: 0;
+    right: auto;
+  }
+
+  /* Active category underline color */
+  .category-subtitle-link.active:after {
+    border-bottom-color: #E91E63;
+  }
+
+  /* Adjust accordion title spacing for subtitles */
+  .accordion-title.has-subtitle {
+    padding: 8px 0;
+  }
+
+  .accordion-title.has-subtitle .accordion-button {
+    align-self: flex-start;
+    margin-top: 5px;
+  }
+
+  .filter-sidebar .accordion-item .accordion-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  /* Price range slider styles */
   .multi-range {
     position: relative;
     height: 30px;
@@ -194,7 +365,107 @@
     }
   }
 
+  // Main document ready function for all sidebar functionality
   $(document).ready(function() {
+    // Add has-subtitle class to accordion titles with subtitles
+    $('.accordion-title').each(function() {
+      if ($(this).find('.category-subtitle-link').length) {
+        $(this).addClass('has-subtitle');
+      }
+    });
+
+    // Check all category links (including subcategories and sub-subcategories)
+    $('.filter-sidebar a.category-title').each(function() {
+      // Get current URL and link URL for comparison
+      let currentUrl = window.location.href.split('?')[0]; // Remove query parameters
+      let linkUrl = $(this).attr('href').split('?')[0]; // Remove query parameters
+
+      // Also try decoding both URLs for comparison
+      currentUrl = decodeURIComponent(currentUrl);
+      linkUrl = decodeURIComponent(linkUrl);
+
+      console.log('Comparing:', currentUrl, linkUrl); // Debug output
+
+      // Check if this is the active category
+      if (currentUrl === linkUrl || window.location.href === $(this).attr('href')) {
+        console.log('Found active category:', $(this).text()); // Debug output
+
+        // Add active class to the title and its subtitle
+        $(this).addClass('active');
+        $(this).siblings('.category-subtitle-link').addClass('active');
+
+        // Expand all parent accordions
+        $(this).parents('.accordion-item').each(function() {
+          $(this).find('.accordion-button').attr('aria-expanded', true);
+          $(this).find('.accordion-collapse').addClass('show');
+        });
+      }
+    });
+
+    // If no exact match was found, try matching by category name
+    if ($('.filter-sidebar a.category-title.active').length === 0) {
+      // Try to find the category by checking if its name appears in the URL or page title
+      let pageTitle = document.title;
+      $('.filter-sidebar a.category-title').each(function() {
+        let categoryName = $(this).text().trim();
+        if (pageTitle.indexOf(categoryName) !== -1 || window.location.href.indexOf(categoryName) !== -1) {
+          $(this).addClass('active');
+          $(this).siblings('.category-subtitle-link').addClass('active');
+
+          // Expand all parent accordions
+          $(this).parents('.accordion-item').each(function() {
+            $(this).find('.accordion-button').attr('aria-expanded', true);
+            $(this).find('.accordion-collapse').addClass('show');
+          });
+        }
+      });
+    }
+
+    // Direct check for specific categories - this ensures they're highlighted when selected
+    // This is a fallback in case the URL matching doesn't work
+    let pageTitle = document.title;
+
+    // Force highlight for '开运饰品' category if it's in the URL or page title
+    $('.filter-sidebar a.category-title').each(function() {
+      let categoryText = $(this).text().trim();
+
+      // Check if this category name is in the URL or page title
+      if (window.location.href.indexOf(categoryText) !== -1 ||
+          pageTitle.indexOf(categoryText) !== -1 ||
+          document.referrer.indexOf(categoryText) !== -1) {
+
+        console.log('Found category in URL/title:', categoryText);
+        $(this).addClass('current-category');
+        $(this).siblings('.category-subtitle-link').addClass('current-category');
+
+        // Expand all parent accordions
+        $(this).parents('.accordion-item').each(function() {
+          $(this).find('.accordion-button').attr('aria-expanded', true);
+          $(this).find('.accordion-collapse').addClass('show');
+        });
+      }
+
+      // Special case for '开运饰品' category
+      if (categoryText === '开运饰品') {
+        if (window.location.href.indexOf('开运饰品') !== -1 ||
+            pageTitle.indexOf('开运饰品') !== -1 ||
+            pageTitle.indexOf('Fortune') !== -1 ||
+            document.referrer.indexOf('开运饰品') !== -1) {
+
+          console.log('Highlighting 开运饰品 category');
+          $(this).addClass('current-category');
+          $(this).siblings('.category-subtitle-link').addClass('current-category');
+
+          // Expand all parent accordions
+          $(this).parents('.accordion-item').each(function() {
+            $(this).find('.accordion-button').attr('aria-expanded', true);
+            $(this).find('.accordion-collapse').addClass('show');
+          });
+        }
+      }
+    });
+
+    // Mobile sidebar toggle functionality
     $('#toggleFilterSidebar').on('click', function() {
       $('#filterSidebar').css('transform', 'translateX(0)');
       $('#overlay').show();
@@ -212,16 +483,6 @@
       }
     });
 
-    $('#filter-category a').each(function() {
-      if ($(this).attr('href') === window.location.href) {
-        $(this).addClass('text-primary');
-        $(this).parents('.accordion-item').each(function() {
-          $(this).find('.accordion-button').attr('aria-expanded', true).siblings('a').addClass('text-primary');
-          $(this).find('.accordion-collapse').addClass('show');
-        });
-      }
-    });
-
     // Price range slider functionality
     const priceMinSlider = document.getElementById('price-min-slider');
     const priceMaxSlider = document.getElementById('price-max-slider');
@@ -229,6 +490,8 @@
     const priceMaxInput = document.getElementById('price-max-input');
 
     if (priceMinSlider && priceMaxSlider) {
+      console.log('Price slider elements found, initializing...');
+
       // Update the price input when sliders change
       priceMinSlider.addEventListener('input', function() {
         // Ensure min doesn't exceed max
@@ -272,13 +535,17 @@
 
       // Apply filter button
       $('#apply-filter-btn').on('click', function() {
+        console.log('Apply filter button clicked');
         applyFilters();
       });
 
       // Reset filter button
       $('#reset-filter-btn').on('click', function() {
+        console.log('Reset filter button clicked');
         resetFilters();
       });
+    } else {
+      console.log('Price slider elements not found');
     }
   });
 
@@ -298,37 +565,93 @@
   }
 
   function applyFilters() {
+    console.log('Applying filters...');
     const priceMinInput = document.getElementById('price-min-input');
     const priceMaxInput = document.getElementById('price-max-input');
     const inStockCheckbox = document.getElementById('in-stock-checkbox');
 
-    let url = inno.removeURLParameters(window.location.href, 'price_start', 'price_end', 'in_stock');
+    // Get current URL
+    let url = window.location.href;
+
+    // Remove existing filter parameters
+    if (typeof inno !== 'undefined' && inno.removeURLParameters) {
+      url = inno.removeURLParameters(url, 'price_start', 'price_end', 'in_stock');
+    } else {
+      // Fallback if inno utility is not available
+      url = removeURLParam(url, 'price_start');
+      url = removeURLParam(url, 'price_end');
+      url = removeURLParam(url, 'in_stock');
+    }
+
+    console.log('URL after removing parameters:', url);
 
     // Add price filter parameters
     if (priceMinInput && parseInt(priceMinInput.value) > 0) {
-      url = inno.updateQueryStringParameter(url, 'price_start', priceMinInput.value);
+      if (typeof inno !== 'undefined' && inno.updateQueryStringParameter) {
+        url = inno.updateQueryStringParameter(url, 'price_start', priceMinInput.value);
+      } else {
+        // Fallback
+        url = addURLParam(url, 'price_start', priceMinInput.value);
+      }
     }
 
     if (priceMaxInput && parseInt(priceMaxInput.value) < parseInt(priceMaxInput.max)) {
-      url = inno.updateQueryStringParameter(url, 'price_end', priceMaxInput.value);
+      if (typeof inno !== 'undefined' && inno.updateQueryStringParameter) {
+        url = inno.updateQueryStringParameter(url, 'price_end', priceMaxInput.value);
+      } else {
+        // Fallback
+        url = addURLParam(url, 'price_end', priceMaxInput.value);
+      }
     }
 
     // Add in-stock filter parameter
     if (inStockCheckbox && inStockCheckbox.checked) {
-      url = inno.updateQueryStringParameter(url, 'in_stock', '1');
+      if (typeof inno !== 'undefined' && inno.updateQueryStringParameter) {
+        url = inno.updateQueryStringParameter(url, 'in_stock', '1');
+      } else {
+        // Fallback
+        url = addURLParam(url, 'in_stock', '1');
+      }
     }
+
+    console.log('Final URL:', url);
 
     // Navigate to the filtered URL
     window.location.href = url;
   }
 
+  // Fallback URL parameter functions in case inno utility is not available
+  function removeURLParam(url, parameter) {
+    const urlParts = url.split('?');
+    if (urlParts.length < 2) return url;
+
+    const prefix = encodeURIComponent(parameter) + '=';
+    const parts = urlParts[1].split(/[&;]/g);
+
+    // Reverse iteration to handle removing multiple instances
+    for (let i = parts.length - 1; i >= 0; i--) {
+      if (parts[i].lastIndexOf(prefix, 0) !== -1) {
+        parts.splice(i, 1);
+      }
+    }
+
+    return urlParts[0] + (parts.length > 0 ? '?' + parts.join('&') : '');
+  }
+
+  function addURLParam(url, key, value) {
+    const separator = url.indexOf('?') !== -1 ? '&' : '?';
+    return url + separator + encodeURIComponent(key) + '=' + encodeURIComponent(value);
+  }
+
   function resetFilters() {
+    console.log('Resetting filters...');
     const priceMinSlider = document.getElementById('price-min-slider');
     const priceMaxSlider = document.getElementById('price-max-slider');
     const priceMinInput = document.getElementById('price-min-input');
     const priceMaxInput = document.getElementById('price-max-input');
     const inStockCheckbox = document.getElementById('in-stock-checkbox');
 
+    // Reset slider and input values
     if (priceMinSlider) {
       priceMinSlider.value = 0;
       if (priceMinInput) priceMinInput.value = 0;
@@ -341,10 +664,22 @@
 
     if (inStockCheckbox) inStockCheckbox.checked = false;
 
+    // Update the slider track appearance
     updateSliderTrack();
 
     // Remove all filter parameters from URL
-    let url = inno.removeURLParameters(window.location.href, 'price_start', 'price_end', 'in_stock');
+    let url = window.location.href;
+
+    if (typeof inno !== 'undefined' && inno.removeURLParameters) {
+      url = inno.removeURLParameters(url, 'price_start', 'price_end', 'in_stock');
+    } else {
+      // Fallback if inno utility is not available
+      url = removeURLParam(url, 'price_start');
+      url = removeURLParam(url, 'price_end');
+      url = removeURLParam(url, 'in_stock');
+    }
+
+    console.log('Reset URL:', url);
     window.location.href = url;
   }
 
