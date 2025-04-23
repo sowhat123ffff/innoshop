@@ -16,7 +16,11 @@ class CartItem extends BaseModel
     protected $table = 'cart_items';
 
     protected $fillable = [
-        'customer_id', 'product_id', 'sku_code', 'guest_id', 'selected', 'quantity',
+        'customer_id', 'product_id', 'sku_code', 'guest_id', 'selected', 'quantity', 'custom_data',
+    ];
+
+    protected $casts = [
+        'custom_data' => 'array',
     ];
 
     /**

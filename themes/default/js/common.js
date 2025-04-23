@@ -25,13 +25,32 @@ export default {
     return null;
   },
 
-  addCart({skuId, quantity = 1, isBuyNow = false}, event, callback) {
+  addCart({skuId, quantity = 1, isBuyNow = false, custom_data = null, ...customData}, event, callback) {
     const base = document.querySelector('base').href;
     const $btn = $(event);
     $btn.addClass('disabled').prepend('<span class="spinner-border spinner-border-sm me-1"></span>');
     $(document).find('.tooltip').remove();
 
-    axios.post(urls.cart_add, {sku_id: skuId, quantity, buy_now: isBuyNow}).then((res) => {
+    // Create the request data object with all parameters
+    const requestData = {
+      quantity,
+      buy_now: isBuyNow,
+      ...customData // Include all custom data fields
+    };
+
+    // Add sku_id if available
+    if (skuId) {
+      requestData.sku_id = skuId;
+    }
+
+    // Add custom_data if provided
+    if (custom_data) {
+      requestData.custom_data = custom_data;
+    }
+
+    console.log('Cart request data:', requestData); // Debug log
+
+    axios.post(urls.cart_add, requestData).then((res) => {
       if (!isBuyNow) {
         layer.msg(res.message)
       }

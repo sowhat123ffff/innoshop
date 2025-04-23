@@ -24,7 +24,11 @@ class Item extends BaseModel
     protected $table = 'order_items';
 
     protected $fillable = [
-        'order_id', 'product_id', 'order_number', 'product_sku', 'variant_label', 'name', 'image', 'quantity', 'price',
+        'order_id', 'product_id', 'order_number', 'product_sku', 'variant_label', 'name', 'image', 'quantity', 'price', 'custom_data',
+    ];
+
+    protected $casts = [
+        'custom_data' => 'array',
     ];
 
     protected $appends = [

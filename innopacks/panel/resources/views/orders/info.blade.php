@@ -76,6 +76,16 @@
         </tr>
         </thead>
         <tbody>
+        @php
+          // Create a map of item IDs that have custom data for quick lookup
+          $itemsWithCustomDataMap = [];
+          if (isset($itemsWithCustomData)) {
+            foreach ($itemsWithCustomData as $itemData) {
+              $itemsWithCustomDataMap[$itemData['item']->id] = true;
+            }
+          }
+        @endphp
+
         @foreach ($order->items as $item)
           <tr>
             <td>{{ $item->id }}</td>
@@ -84,7 +94,14 @@
                 <div class="product-image wh-40 border"><img src="{{ $item->image }}" class="img-fluid">
                 </div>
                 <div class="product-info ms-2">
-                  <div class="name">{{ $item->name }}</div>
+                  <div class="name">
+                    {{ $item->name }}
+                    @if(isset($itemsWithCustomDataMap[$item->id]))
+                      <a href="#custom-info-section" class="badge bg-info ms-1" title="Has custom information - Click to view">
+                        <i class="bi bi-person-vcard"></i>
+                      </a>
+                    @endif
+                  </div>
                   @if($item->productSku->variantLabel ?? '')
                     <span class="small fst-italic">{{ $item->productSku->variantLabel }}</span>
                   @endif
@@ -216,9 +233,21 @@
 
   @hookinsert('panel.orders.info.comment.after')
 
-  <div class="card mb-4">
+  <div class="card mb-4" id="custom-info-section">
     <div class="card-header bg-light">
-      <h5 class="card-title mb-0"><i class="bi bi-person-vcard me-2"></i>{{ __('panel/order.custom_information') ?? 'Custom Information' }}</h5>
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h5 class="card-title mb-0"><i class="bi bi-person-vcard me-2"></i>{{ __('panel/order.custom_information') ?? 'Custom Information' }}</h5>
+          @if(auth()->user() && auth()->user()->hasRole('admin'))
+            <div class="small text-muted mt-1">
+              <i class="bi bi-info-circle me-1"></i> Custom information is now automatically saved from product forms. No need to add "=== CUSTOM INFORMATION ===" to comments.
+            </div>
+          @endif
+        </div>
+        @if(isset($itemsWithCustomData) && count($itemsWithCustomData) > 0)
+          <span class="badge bg-primary rounded-pill">{{ count($itemsWithCustomData) }} {{ Str::plural('item', count($itemsWithCustomData)) }}</span>
+        @endif
+      </div>
     </div>
     <div class="card-body">
       <div class="row">
@@ -232,176 +261,306 @@
             </thead>
             <tbody>
               @php
-                // Get custom data from order items
-                $customData = [];
+                // Create an array to store custom data for each order item
+                $itemsWithCustomData = [];
+                $hasCustomData = false;
 
                 // Check if the order has items with custom data
                 foreach ($order->items as $item) {
-                  // Try to extract custom data from the item name
-                  if (strpos($item->name, 'customerName:') !== false) {
-                    // The custom data might be embedded in the item name
+                  $itemCustomData = null;
+
+                  // Check for custom_data field in the order item
+                  if (isset($item->custom_data) && !empty($item->custom_data)) {
+                    if (is_array($item->custom_data)) {
+                      $itemCustomData = $item->custom_data;
+                    } else {
+                      try {
+                        $decodedData = json_decode($item->custom_data, true);
+                        if (is_array($decodedData)) {
+                          $itemCustomData = $decodedData;
+                        }
+                      } catch (\Exception $e) {
+                        // Invalid JSON, ignore
+                      }
+                    }
+                  }
+
+                  // Try to extract custom data from the item name as fallback
+                  if (empty($itemCustomData) && strpos($item->name, 'customerName:') !== false) {
+                    $itemCustomData = [];
                     $nameParts = explode('\n', $item->name);
                     foreach ($nameParts as $part) {
                       if (strpos($part, ':') !== false) {
                         list($key, $value) = explode(':', $part, 2);
-                        $customData[trim($key)] = trim($value);
+                        $itemCustomData[trim($key)] = trim($value);
                       }
                     }
                   }
 
                   // Check if the item has a reference field
-                  if (isset($item->reference) && is_array($item->reference)) {
-                    $customData = array_merge($customData, $item->reference);
+                  if (empty($itemCustomData) && isset($item->reference) && is_array($item->reference)) {
+                    $itemCustomData = $item->reference;
+                  }
+
+                  // If we found custom data for this item, add it to our array
+                  if (!empty($itemCustomData)) {
+                    $hasCustomData = true;
+                    $itemsWithCustomData[] = [
+                      'item' => $item,
+                      'customData' => $itemCustomData
+                    ];
                   }
                 }
 
-                // Check order fees for custom data
-                foreach ($order->fees as $fee) {
-                  if (isset($fee->reference) && is_array($fee->reference)) {
-                    $customData = array_merge($customData, $fee->reference);
-                  }
-                }
+                // If no items have custom data, check the order level custom data
+                if (empty($itemsWithCustomData)) {
+                  $orderCustomData = null;
 
-                // Check for custom_data field in the order
-                if (isset($order->custom_data) && !empty($order->custom_data)) {
-                  try {
-                    $customDataJson = json_decode($order->custom_data, true);
-                    if (isset($customDataJson['panel_order_custom_information'])) {
-                      $customData = array_merge($customData, $customDataJson['panel_order_custom_information']);
+                  // Check for custom_data field in the order
+                  if (isset($order->custom_data) && !empty($order->custom_data)) {
+                    if (is_array($order->custom_data)) {
+                      $orderCustomData = $order->custom_data;
                     } else {
-                      $customData = array_merge($customData, $customDataJson);
+                      try {
+                        $decodedData = json_decode($order->custom_data, true);
+                        if (is_array($decodedData)) {
+                          if (isset($decodedData['panel_order_custom_information'])) {
+                            $orderCustomData = $decodedData['panel_order_custom_information'];
+                          } else {
+                            $orderCustomData = $decodedData;
+                          }
+                        }
+                      } catch (\Exception $e) {
+                        // Invalid JSON, ignore
+                      }
                     }
-                  } catch (\Exception $e) {
-                    // Invalid JSON, ignore
-                  }
-                }
-
-                // Parse custom information from order comment as fallback
-                if (empty($customData) && $order->comment && is_string($order->comment)) {
-                  // First try JSON
-                  try {
-                    $commentData = json_decode($order->comment, true);
-                    if (is_array($commentData)) {
-                      $customData = array_merge($customData, $commentData);
-                    }
-                  } catch (\Exception $e) {
-                    // Not valid JSON, try parsing manually
                   }
 
-                  // If we have a custom information section in the comment
-                  if (strpos($order->comment, '=== CUSTOM INFORMATION ===') !== false) {
-                    $parts = explode('=== CUSTOM INFORMATION ===', $order->comment);
-                    if (isset($parts[1])) {
-                      $customInfoText = trim($parts[1]);
-                      $lines = preg_split('/\r\n|\r|\n/', $customInfoText);
+                  // Parse custom information from order comment as fallback (legacy support)
+                  if (empty($orderCustomData) && $order->comment && is_string($order->comment)) {
+                    // Try to parse JSON from comment
+                    try {
+                      $commentData = json_decode($order->comment, true);
+                      if (is_array($commentData)) {
+                        $orderCustomData = $commentData;
+                      }
+                    } catch (\Exception $e) {
+                      // Not valid JSON
+                    }
 
-                      foreach ($lines as $line) {
-                        $line = trim($line);
-                        if (empty($line)) continue;
+                    // Note: The '=== CUSTOM INFORMATION ===' parsing is no longer needed for new orders
+                    // as custom data is now properly stored in the database. This code is kept for
+                    // backward compatibility with older orders only.
 
-                        // Extract field and value
-                        if (strpos($line, ':') !== false) {
+                    // Legacy support for older orders with custom information in comments
+                    if (empty($orderCustomData) && strpos($order->comment, '=== CUSTOM INFORMATION ===') !== false) {
+                      // Log that we're using the legacy parser for debugging purposes
+                      if (config('app.debug')) {
+                        \Log::info('Using legacy custom information parser for order #' . $order->id);
+                      }
+
+                      $orderCustomData = [];
+                      $parts = explode('=== CUSTOM INFORMATION ===', $order->comment);
+                      if (isset($parts[1])) {
+                        $customInfoText = trim($parts[1]);
+                        $lines = preg_split('/\r\n|\r|\n/', $customInfoText);
+
+                        // Simple mapping of known fields
+                        $fieldMappings = [
+                          '姓名 Name' => 'customerName',
+                          '性别 Gender' => 'customerGender',
+                          '阳历生日' => 'customerDOB',
+                          'Date of Birth (Solar)' => 'customerDOB',
+                          '农历生日' => 'customerLunarDOB',
+                          'Date of Birth (Lunar)' => 'customerLunarDOB',
+                          '生肖' => 'customerZodiac',
+                          'Chinese Zodiac' => 'customerZodiac',
+                          '出生时间' => 'customerTimeOfBirth',
+                          'Time of Birth' => 'customerTimeOfBirth',
+                          '联络号码' => 'customerWhatsApp',
+                          'WhatsApp' => 'customerWhatsApp'
+                        ];
+
+                        foreach ($lines as $line) {
+                          $line = trim($line);
+                          if (empty($line) || strpos($line, ':') === false) continue;
+
                           list($field, $value) = explode(':', $line, 2);
                           $field = trim($field);
                           $value = trim($value);
 
-                          // Map fields to our expected keys
-                          if (strpos($field, '姓名 Name') !== false) {
-                            $customData['customerName'] = $value;
-                          } else if (strpos($field, '性别 Gender') !== false) {
-                            $customData['customerGender'] = $value;
-                          } else if (strpos($field, '阳历生日') !== false || strpos($field, 'Date of Birth (Solar)') !== false) {
-                            $customData['customerDOB'] = $value;
-                          } else if (strpos($field, '农历生日') !== false || strpos($field, 'Date of Birth (Lunar)') !== false) {
-                            $customData['customerLunarDOB'] = $value;
-                          } else if (strpos($field, '生肖') !== false || strpos($field, 'Chinese Zodiac') !== false) {
-                            $customData['customerZodiac'] = $value;
-                          } else if (strpos($field, '出生时间') !== false || strpos($field, 'Time of Birth') !== false) {
-                            $customData['customerTimeOfBirth'] = $value;
-                          } else if (strpos($field, '联络号码') !== false || strpos($field, 'WhatsApp') !== false) {
-                            $customData['customerWhatsApp'] = $value;
+                          // Check against our mapping
+                          foreach ($fieldMappings as $searchText => $mappedField) {
+                            if (strpos($field, $searchText) !== false) {
+                              $orderCustomData[$mappedField] = $value;
+                              break;
+                            }
                           }
                         }
                       }
                     }
                   }
-                }
 
-                // If no custom data found, try to extract from the first item's name
-                if (empty($customData) && count($order->items) > 0) {
-                  $firstItem = $order->items->first();
-                  $customData = [
-                    'itemName' => $firstItem->name,
-                    'itemSku' => $firstItem->product_sku,
-                    'itemVariant' => $firstItem->variant_label,
-                  ];
+                  // If we found order-level custom data, add it to our array
+                  if (!empty($orderCustomData)) {
+                    $hasCustomData = true;
+                    // Use the first order item as a placeholder
+                    $firstItem = $order->items->first();
+                    $itemsWithCustomData[] = [
+                      'item' => $firstItem,
+                      'customData' => $orderCustomData,
+                      'isOrderLevel' => true
+                    ];
+                  }
                 }
               @endphp
 
-              @if (!empty($customData['customerName']))
-                <tr>
-                  <td class="fw-medium"><i class="bi bi-person me-2"></i>姓名 Name</td>
-                  <td>{{ $customData['customerName'] }}</td>
-                </tr>
-              @endif
+              @if(count($itemsWithCustomData) > 0)
+                @foreach($itemsWithCustomData as $index => $itemData)
+                  @php
+                    $item = $itemData['item'];
+                    $customData = $itemData['customData'];
+                    $isOrderLevel = $itemData['isOrderLevel'] ?? false;
+                  @endphp
 
-              @if (!empty($customData['customerGender']))
-                <tr>
-                  <td class="fw-medium"><i class="bi bi-gender-ambiguous me-2"></i>性别 Gender</td>
-                  <td>
-                    @if(strtolower($customData['customerGender']) == 'male')
-                      <span class="badge bg-primary">Male 男</span>
-                    @elseif(strtolower($customData['customerGender']) == 'female')
-                      <span class="badge bg-danger">Female 女</span>
-                    @else
-                      {{ $customData['customerGender'] }}
-                    @endif
-                  </td>
-                </tr>
-              @endif
+                  <!-- Product header with item information -->
+                  <tr class="table-{{ $index % 2 == 0 ? 'primary' : 'info' }} text-dark">
+                    <td colspan="2" class="py-3">
+                      <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0 me-3">
+                          <span class="badge bg-{{ $index % 2 == 0 ? 'primary' : 'info' }} rounded-circle p-2">
+                            <i class="bi bi-{{ $isOrderLevel ? 'file-earmark-text' : 'box-seam' }} fs-5"></i>
+                          </span>
+                        </div>
+                        <div class="flex-grow-1">
+                          <h5 class="mb-0">{{ $item->name }}</h5>
+                          <div class="small">
+                            <span class="me-3"><i class="bi bi-upc me-1"></i>SKU: {{ $item->product_sku }}</span>
+                            @if($item->variant_label)
+                              <span class="me-3"><i class="bi bi-tags me-1"></i>Variant: {{ $item->variant_label }}</span>
+                            @endif
+                            <span><i class="bi bi-123 me-1"></i>Quantity: {{ $item->quantity }}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
 
-              @if (!empty($customData['customerDOB']))
-                <tr>
-                  <td class="fw-medium"><i class="bi bi-calendar-date me-2"></i>阳历生日 Date of Birth (Solar)</td>
-                  <td>{{ $customData['customerDOB'] }}</td>
-                </tr>
-              @endif
+                  <!-- Custom information fields -->
+                  @php
+                    $hasAnyCustomField = !empty($customData['customerName']) ||
+                                        !empty($customData['customerGender']) ||
+                                        !empty($customData['customerDOB']) ||
+                                        !empty($customData['customerLunarDOB']) ||
+                                        !empty($customData['customerZodiac']) ||
+                                        !empty($customData['customerTimeOfBirth']) ||
+                                        !empty($customData['customerWhatsApp']);
+                  @endphp
 
-              @if (!empty($customData['customerLunarDOB']))
-                <tr>
-                  <td class="fw-medium"><i class="bi bi-calendar-heart me-2"></i>农历生日 Date of Birth (Lunar)</td>
-                  <td>{{ $customData['customerLunarDOB'] }}</td>
-                </tr>
-              @endif
+                  @if(!$hasAnyCustomField)
+                    <tr>
+                      <td colspan="2" class="text-center text-muted py-3">
+                        <i class="bi bi-info-circle me-2"></i>This product has custom data enabled but no specific fields were filled in.
+                      </td>
+                    </tr>
+                  @endif
 
-              @if (!empty($customData['customerZodiac']))
-                <tr>
-                  <td class="fw-medium"><i class="bi bi-stars me-2"></i>生肖 Chinese Zodiac</td>
-                  <td>
-                    <span class="badge bg-secondary">{{ $customData['customerZodiac'] }}</span>
-                  </td>
-                </tr>
-              @endif
+                  @if (!empty($customData['customerName']))
+                    <tr>
+                      <td class="fw-medium"><i class="bi bi-person me-2"></i>姓名 Name</td>
+                      <td>{{ $customData['customerName'] }}</td>
+                    </tr>
+                  @endif
 
-              @if (!empty($customData['customerTimeOfBirth']))
-                <tr>
-                  <td class="fw-medium"><i class="bi bi-clock-history me-2"></i>出生时间 Time of Birth</td>
-                  <td>{{ $customData['customerTimeOfBirth'] }}</td>
-                </tr>
-              @endif
+                  @if (!empty($customData['customerGender']))
+                    <tr>
+                      <td class="fw-medium"><i class="bi bi-gender-ambiguous me-2"></i>性别 Gender</td>
+                      <td>
+                        @if(strtolower($customData['customerGender']) == 'male')
+                          <span class="badge bg-primary">Male 男</span>
+                        @elseif(strtolower($customData['customerGender']) == 'female')
+                          <span class="badge bg-danger">Female 女</span>
+                        @else
+                          {{ $customData['customerGender'] }}
+                        @endif
+                      </td>
+                    </tr>
+                  @endif
 
-              @if (!empty($customData['customerWhatsApp']))
-                <tr>
-                  <td class="fw-medium"><i class="bi bi-whatsapp me-2"></i>联络号码 WhatsApp</td>
-                  <td>
-                    <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $customData['customerWhatsApp']) }}" target="_blank" class="text-decoration-none">
-                      {{ $customData['customerWhatsApp'] }} <i class="bi bi-box-arrow-up-right ms-1 small"></i>
-                    </a>
-                  </td>
-                </tr>
-              @endif
+                  @if (!empty($customData['customerDOB']))
+                    <tr>
+                      <td class="fw-medium"><i class="bi bi-calendar-date me-2"></i>阳历生日 Date of Birth (Solar)</td>
+                      <td>{{ $customData['customerDOB'] }}</td>
+                    </tr>
+                  @endif
 
-              @if (empty($customData['customerName']) && empty($customData['customerGender']) && empty($customData['customerDOB']) && empty($customData['customerLunarDOB']) && empty($customData['customerZodiac']) && empty($customData['customerTimeOfBirth']) && empty($customData['customerWhatsApp']))
+                  @if (!empty($customData['customerLunarDOB']))
+                    <tr>
+                      <td class="fw-medium"><i class="bi bi-calendar-heart me-2"></i>农历生日 Date of Birth (Lunar)</td>
+                      <td>{{ $customData['customerLunarDOB'] }}</td>
+                    </tr>
+                  @endif
+
+                  @if (!empty($customData['customerZodiac']))
+                    <tr>
+                      <td class="fw-medium"><i class="bi bi-stars me-2"></i>生肖 Chinese Zodiac</td>
+                      <td>
+                        <span class="badge bg-secondary">{{ $customData['customerZodiac'] }}</span>
+                      </td>
+                    </tr>
+                  @endif
+
+                  @if (!empty($customData['customerTimeOfBirth']))
+                    <tr>
+                      <td class="fw-medium"><i class="bi bi-clock-history me-2"></i>出生时间 Time of Birth</td>
+                      <td>{{ $customData['customerTimeOfBirth'] }}</td>
+                    </tr>
+                  @endif
+
+                  @if (!empty($customData['customerWhatsApp']))
+                    <tr>
+                      <td class="fw-medium"><i class="bi bi-whatsapp me-2"></i>联络号码 WhatsApp</td>
+                      <td>
+                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $customData['customerWhatsApp']) }}" target="_blank" class="text-decoration-none">
+                          {{ $customData['customerWhatsApp'] }} <i class="bi bi-box-arrow-up-right ms-1 small"></i>
+                        </a>
+                      </td>
+                    </tr>
+                  @endif
+
+                  @if(auth()->user() && auth()->user()->hasRole('admin'))
+                    <!-- Debug section for this specific item (only visible to admins) -->
+                    <tr class="table-light">
+                      <td colspan="2">
+                        <div class="accordion accordion-flush" id="debugAccordion{{ $index }}">
+                          <div class="accordion-item">
+                            <h2 class="accordion-header">
+                              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDebug{{ $index }}" aria-expanded="false">
+                                <i class="bi bi-bug me-2"></i>Debug Information (Admin Only)
+                              </button>
+                            </h2>
+                            <div id="collapseDebug{{ $index }}" class="accordion-collapse collapse" data-bs-parent="#debugAccordion{{ $index }}">
+                              <div class="accordion-body bg-light">
+                                <h6>Item Data:</h6>
+                                <pre class="mb-3" style="max-height: 150px; overflow: auto;">{{ json_encode($item, JSON_PRETTY_PRINT) }}</pre>
+                                <h6>Custom Data:</h6>
+                                <pre class="mb-0" style="max-height: 150px; overflow: auto;">{{ json_encode($customData, JSON_PRETTY_PRINT) }}</pre>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  @endif
+
+                  <!-- Spacer row between products -->
+                  @if(!$loop->last)
+                    <tr>
+                      <td colspan="2" class="border-0 py-2"></td>
+                    </tr>
+                  @endif
+                @endforeach
+              @else
                 <tr>
                   <td colspan="2" class="text-center">No custom information available</td>
                 </tr>

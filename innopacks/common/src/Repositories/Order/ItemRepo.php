@@ -47,7 +47,16 @@ class ItemRepo extends BaseRepo
 
         $orderItems = [];
         foreach ($items as $item) {
-            $orderItems[] = $this->handleItem($order, $item);
+            // If the item is a CartItem model, get the custom_data from it
+            if (is_object($item) && method_exists($item, 'getAttributes')) {
+                $itemData = $item->getAttributes();
+                // Add the cart item itself for reference
+                $itemData['cart'] = $item;
+            } else {
+                $itemData = $item;
+            }
+
+            $orderItems[] = $this->handleItem($order, $itemData);
         }
         $order->items()->createMany($orderItems);
     }
@@ -61,6 +70,14 @@ class ItemRepo extends BaseRepo
     {
         $sku = Sku::query()->where('code', $requestData['sku_code'])->firstOrFail();
 
+        // Get custom data from cart item if available
+        $customData = null;
+        if (isset($requestData['custom_data'])) {
+            $customData = $requestData['custom_data'];
+        } elseif (isset($requestData['cart']) && isset($requestData['cart']->custom_data)) {
+            $customData = $requestData['cart']->custom_data;
+        }
+
         return [
             'order_id'      => $requestData['order_id'] ?? 0,
             'product_id'    => $sku->product_id,
@@ -71,6 +88,7 @@ class ItemRepo extends BaseRepo
             'image'         => $requestData['image'],
             'quantity'      => $requestData['quantity'],
             'price'         => $requestData['price'],
+            'custom_data'   => $customData,
         ];
     }
 }

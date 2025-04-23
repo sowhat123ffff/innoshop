@@ -49,6 +49,7 @@ class CartListItem extends JsonResource
                 'image'               => $sku->getImageUrl(),
                 'url'                 => $product->url,
                 'selected'            => (bool) $this->selected,
+                'custom_data'         => $this->custom_data,
             ],
             'cart' => $this,
         ];

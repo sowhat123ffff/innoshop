@@ -249,8 +249,7 @@
           shipping_method_code: @json($checkout['shipping_method_code'] ?? ''),
           billing_method_code: @json($checkout['billing_method_code'] ?? ''),
           comment: '',
-          custom_data: '',
-          customData: localStorage.getItem('customFormData') || ''
+          custom_data: ''
         })
 
         const isCheckout = computed(() => {
@@ -328,37 +327,15 @@
               // Parse the custom form data
               const customData = JSON.parse(customFormData);
 
-              // Create a structured format for the custom data
-              const customInfoObj = {
-                panel_order_custom_information: {
-                  customerName: customData.customerName || '',
-                  customerGender: customData.customerGender || '',
-                  customerDOB: customData.customerDOB || '',
-                  customerLunarDOB: customData.customerLunarDOB || '',
-                  customerZodiac: customData.customerZodiac || '',
-                  customerTimeOfBirth: customData.customerTimeOfBirth || '',
-                  customerWhatsApp: customData.customerWhatsApp || ''
-                }
-              };
+              // Add the custom data directly to the current object
+              // This is now the primary way custom data is stored and retrieved
+              current.custom_data = customData;
 
-              // Add the structured data as JSON to a hidden field
-              current.custom_data = JSON.stringify(customInfoObj);
+              // Note: We no longer need to add custom data to the comment
+              // The custom_data field is now properly handled throughout the system
+              // and displayed in the admin panel under the Custom Information section
 
-              // Also add to comment for backward compatibility
-              if (current.comment) {
-                current.comment += '\n\n=== CUSTOM INFORMATION ===\n\n';
-              } else {
-                current.comment = '=== CUSTOM INFORMATION ===\n\n';
-              }
-
-              // Add each custom field to the comment with proper formatting - each on its own line with spacing
-              if (customData.customerName) current.comment += '姓名 Name: ' + customData.customerName + '\n\n';
-              if (customData.customerGender) current.comment += '性别 Gender: ' + customData.customerGender + '\n\n';
-              if (customData.customerDOB) current.comment += '阳历生日 Date of Birth (Solar): ' + customData.customerDOB + '\n\n';
-              if (customData.customerLunarDOB) current.comment += '农历生日 Date of Birth (Lunar): ' + customData.customerLunarDOB + '\n\n';
-              if (customData.customerZodiac) current.comment += '生肖 Chinese Zodiac: ' + customData.customerZodiac + '\n\n';
-              if (customData.customerTimeOfBirth) current.comment += '出生时间 Time of Birth: ' + customData.customerTimeOfBirth + '\n\n';
-              if (customData.customerWhatsApp) current.comment += '联络号码 WhatsApp: ' + customData.customerWhatsApp;
+              console.log('Added custom data to cart item:', customData);
             } catch (e) {
               console.error('Error parsing custom form data:', e);
             }

@@ -241,6 +241,23 @@
                   Please enter your WhatsApp number / 请输入您的WhatsApp号码
                 </div>
               </div>
+
+              <!-- Temporary Button for Testing -->
+              <div class="mb-3 text-center">
+                <div class="position-relative d-inline-block w-100">
+                  <button type="button" id="saveCustomDataBtn" class="btn btn-warning btn-lg w-100">
+                    <i class="bi bi-database-add"></i> Add data to database (Test)
+                  </button>
+                  <span id="testDataSavedBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success" style="display: none;">
+                    <i class="bi bi-check-lg"></i>
+                    <span class="visually-hidden">Custom data saved</span>
+                  </span>
+                </div>
+                <div id="customDataSaveResult" class="mt-2" style="display: none;"></div>
+                <div class="form-text small text-muted mt-2">
+                  This button is for testing purposes only. It will save the custom form data to the database without adding the product to your cart.
+                </div>
+              </div>
             </div>
             @endif
 
@@ -252,14 +269,26 @@
               </div>
 
               <div class="product-info-btns">
-                <button class="btn btn-primary add-cart" data-id="{{ $product->id }}"
-                        data-price="{{ $product->masterSku->price }}">
-                  {{ __('front/product.add_to_cart') }}
-                </button>
-                <button class="btn buy-now ms-2" data-id="{{ $product->id }}"
-                        data-price="{{ $product->masterSku->price }}">
-                  {{ __('front/product.buy_now') }}
-                </button>
+                <div class="position-relative d-inline-block">
+                  <button class="btn btn-primary add-cart" data-id="{{ $product->id }}"
+                          data-price="{{ $product->masterSku->price }}">
+                    {{ __('front/product.add_to_cart') }}
+                  </button>
+                  <span id="customDataSavedBadge1" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success" style="display: none;">
+                    <i class="bi bi-check-lg"></i>
+                    <span class="visually-hidden">Custom data saved</span>
+                  </span>
+                </div>
+                <div class="position-relative d-inline-block ms-2">
+                  <button class="btn buy-now" data-id="{{ $product->id }}"
+                          data-price="{{ $product->masterSku->price }}">
+                    {{ __('front/product.buy_now') }}
+                  </button>
+                  <span id="customDataSavedBadge2" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success" style="display: none;">
+                    <i class="bi bi-check-lg"></i>
+                    <span class="visually-hidden">Custom data saved</span>
+                  </span>
+                </div>
                 @hookinsert('product.detail.cart.after')
               </div>
             </div>
@@ -403,22 +432,30 @@
           }
         });
 
+        // Function to hide all success badges when form data changes
+        function hideSuccessBadges() {
+          $('#customDataSavedBadge1, #customDataSavedBadge2, #testDataSavedBadge').fadeOut('fast');
+        }
+
         // Hide error message when user starts typing
         $('#customerName').on('input', function() {
           if ($(this).val().trim()) {
             $(this).removeClass('is-invalid');
             $('#customerNameError').hide();
           }
+          hideSuccessBadges();
         });
 
         // Hide error message when gender is selected
         $('input[name="customerGender"]').on('change', function() {
           $('#customerGenderError').hide();
+          hideSuccessBadges();
         });
 
         // Hide error message when time of birth is selected
         $('#customerTimeOfBirth').on('change', function() {
           $('#customerTimeError').hide();
+          hideSuccessBadges();
         });
 
         // Hide error message when WhatsApp number is entered
@@ -426,6 +463,22 @@
           if ($(this).val().trim()) {
             $('#customerWhatsAppError').hide();
           }
+          hideSuccessBadges();
+        });
+
+        // Hide success badges when date of birth changes
+        $('#customerDOB').on('change', function() {
+          hideSuccessBadges();
+        });
+
+        // Hide success badges when zodiac changes
+        $('#customerZodiac').on('change', function() {
+          hideSuccessBadges();
+        });
+
+        // Hide success badges when quantity changes
+        $('.product-quantity').on('change', function() {
+          hideSuccessBadges();
         });
 
         // Function to convert solar date to lunar date using lunar-javascript library
@@ -570,6 +623,228 @@
           $('#customerDOB').datepicker('show');
         });
 
+        // Function to validate the custom form
+        function validateCustomForm() {
+          let isValid = true;
+          const customerNameField = $('#customerName');
+          const customerName = customerNameField.val() || '';
+
+          // Validate name
+          if (!customerName.trim()) {
+            customerNameField.addClass('is-invalid');
+            $('#customerNameError').show();
+            customerNameField.focus();
+            isValid = false;
+          } else {
+            customerNameField.removeClass('is-invalid');
+            $('#customerNameError').hide();
+          }
+
+          // Validate gender
+          const genderSelected = $('input[name="customerGender"]:checked').val();
+          if (!genderSelected) {
+            $('#customerGenderError').show();
+            if (isValid) {
+              $('input[name="customerGender"]').first().focus();
+            }
+            isValid = false;
+          } else {
+            $('#customerGenderError').hide();
+          }
+
+          // Validate date of birth
+          const dobValue = $('#customerDOB').val();
+          if (!dobValue) {
+            $('#customerDOBError').show();
+            if (isValid) {
+              $('#customerDOB').focus();
+            }
+            isValid = false;
+          } else {
+            $('#customerDOBError').hide();
+          }
+
+          // Validate time of birth
+          const timeValue = $('#customerTimeOfBirth').val();
+          if (!timeValue) {
+            $('#customerTimeError').show();
+            if (isValid) {
+              $('#customerTimeOfBirth').focus();
+            }
+            isValid = false;
+          } else {
+            $('#customerTimeError').hide();
+          }
+
+          // Validate WhatsApp number
+          const whatsappValue = $('#customerWhatsApp').val();
+          if (!whatsappValue.trim()) {
+            $('#customerWhatsAppError').show();
+            if (isValid) {
+              $('#customerWhatsApp').focus();
+            }
+            isValid = false;
+          } else {
+            $('#customerWhatsAppError').hide();
+          }
+
+          return isValid;
+        }
+
+        // Function to get custom form data
+        function getCustomFormData() {
+          return {
+            customerName: $('#customerName').val() || '',
+            customerGender: $('input[name="customerGender"]:checked').val(),
+            customerDOB: $('#customerDOB').val(),
+            customerLunarDOB: $('#customerLunarDOB').val(),
+            customerZodiac: $('#customerZodiac').val(),
+            customerTimeOfBirth: $('#customerTimeOfBirth option:selected').text(),
+            customerTimeOfBirthValue: $('#customerTimeOfBirth').val(),
+            customerWhatsApp: $('#customerWhatsApp').val()
+          };
+        }
+
+        // Handle the "Add data to database" button click
+        $('#saveCustomDataBtn').on('click', function() {
+          // Validate the form
+          if (!validateCustomForm()) {
+            return false;
+          }
+
+          // Get the form data
+          const customData = getCustomFormData();
+          const quantity = $('.product-quantity').val();
+          const skuId = $('.product-quantity').data('sku-id');
+
+          // Debug: Log the SKU ID
+          console.log('SKU ID from data attribute:', skuId);
+
+          // If skuId is undefined or empty, try to get it from other sources
+          if (!skuId) {
+            // Try to get it from the URL or other elements
+            const skuIdFromUrl = new URLSearchParams(window.location.search).get('sku_id');
+            const skuIdFromElement = $('.product-info').data('sku-id') || $('[data-sku-id]').first().data('sku-id');
+
+            console.log('SKU ID from URL:', skuIdFromUrl);
+            console.log('SKU ID from other elements:', skuIdFromElement);
+
+            // Use the first available value
+            if (skuIdFromUrl) {
+              skuId = skuIdFromUrl;
+            } else if (skuIdFromElement) {
+              skuId = skuIdFromElement;
+            } else {
+              // Fallback to the product ID if available
+              skuId = $('.add-cart').data('id') || $('.buy-now').data('id');
+              console.log('Fallback to product ID:', skuId);
+            }
+          }
+
+          // Get the SKU ID and code directly from the Blade template
+          const skuIdDirect = {{ $sku['id'] ?? 0 }};
+          const skuCode = '{{ $sku["code"] ?? "" }}';
+
+          // Use the direct SKU ID if the data attribute didn't work
+          if (!skuId && skuIdDirect) {
+            skuId = skuIdDirect;
+            console.log('Using SKU ID from Blade template:', skuId);
+          }
+
+          // Create the cart data object
+          const cartData = {
+            quantity,
+            isBuyNow: false,
+            custom_data: customData
+          };
+
+          // Add either sku_id or sku_code depending on what's available
+          if (skuId) {
+            cartData.sku_id = skuId;
+          } else if (skuCode) {
+            cartData.sku_code = skuCode;
+            console.log('Using SKU code instead of ID:', skuCode);
+          } else {
+            // Show error if neither is available
+            $('#customDataSaveResult').html('<div class="alert alert-danger"><h5><i class="bi bi-exclamation-triangle-fill me-2"></i>Error</h5>Could not determine SKU ID or code. Please try again or contact support.</div>').show();
+            $('#saveCustomDataBtn').prop('disabled', false).html('<i class="bi bi-database-add"></i> Add data to database (Test)');
+            return false;
+          }
+
+          // Log the data being sent
+          console.log('Sending data to server:', cartData);
+
+          // Show loading indicator
+          $('#saveCustomDataBtn').prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span> Saving...');
+          $('#customDataSaveResult').hide();
+
+          // Send the data to the server
+          axios.post(urls.cart_add, cartData)
+            .then(function(res) {
+              if (res.success) {
+                // Create a more detailed success message
+                let successMsg = '<div class="alert alert-success">' +
+                  '<h5><i class="bi bi-check-circle-fill me-2"></i>Data saved successfully!</h5>' +
+                  '<p class="mb-0">Your custom information has been saved to the database.</p>';
+
+                // Add cart ID if available
+                if (res.data && res.data.list && res.data.list.length > 0) {
+                  const cartItem = res.data.list[0];
+                  successMsg += '<p class="mb-0 mt-2"><small>Cart Item ID: ' + cartItem.id + '</small></p>';
+                }
+
+                successMsg += '</div>';
+
+                $('#customDataSaveResult').html(successMsg).show();
+
+                // Show the success badge with animation
+                $('#testDataSavedBadge').fadeIn('fast');
+                $('#saveCustomDataBtn').addClass('btn-success').removeClass('btn-warning');
+                setTimeout(function() {
+                  $('#saveCustomDataBtn').addClass('btn-warning').removeClass('btn-success');
+                }, 1000);
+
+                // Hide the badge after 5 seconds
+                setTimeout(function() {
+                  $('#testDataSavedBadge').fadeOut('slow');
+                }, 5000);
+
+                console.log('Custom data saved:', res.data);
+              } else {
+                $('#customDataSaveResult').html('<div class="alert alert-danger">Error: ' + (res.message || 'Unknown error') + '</div>').show();
+                console.error('Error saving custom data:', res);
+              }
+            })
+            .catch(function(error) {
+              let errorMessage = 'Unknown error';
+
+              // Extract detailed error message if available
+              if (error.response && error.response.data) {
+                if (error.response.data.message) {
+                  errorMessage = error.response.data.message;
+                }
+
+                // If there are validation errors, show them in detail
+                if (error.response.data.errors) {
+                  errorMessage += '<ul class="mt-2 mb-0">';
+                  for (const field in error.response.data.errors) {
+                    errorMessage += '<li>' + error.response.data.errors[field][0] + '</li>';
+                  }
+                  errorMessage += '</ul>';
+                }
+              } else if (error.message) {
+                errorMessage = error.message;
+              }
+
+              $('#customDataSaveResult').html('<div class="alert alert-danger"><h5><i class="bi bi-exclamation-triangle-fill me-2"></i>Error</h5>' + errorMessage + '</div>').show();
+              console.error('Error saving custom data:', error);
+            })
+            .finally(function() {
+              // Re-enable the button
+              $('#saveCustomDataBtn').prop('disabled', false).html('<i class="bi bi-database-add"></i> Add data to database (Test)');
+            });
+        });
+
         $('.add-cart, .buy-now').on('click', function (e) {
           const quantity = $('.product-quantity').val();
           const skuId = $('.product-quantity').data('sku-id');
@@ -579,96 +854,41 @@
 
           // Check if custom form exists and validate
           if ($('.custom-form-container').length > 0) {
-            let isValid = true;
+            e.preventDefault(); // Prevent default action until validation is complete
 
-            // Validate name
-            if (!customerName.trim()) {
-              e.preventDefault();
-              customerNameField.addClass('is-invalid');
-              $('#customerNameError').show();
-              customerNameField.focus();
-              isValid = false;
-            } else {
-              customerNameField.removeClass('is-invalid');
-              $('#customerNameError').hide();
-            }
-
-            // Validate gender
-            const genderSelected = $('input[name="customerGender"]:checked').val();
-            if (!genderSelected) {
-              e.preventDefault();
-              $('#customerGenderError').show();
-              if (isValid) {
-                $('input[name="customerGender"]').first().focus();
-              }
-              isValid = false;
-            } else {
-              $('#customerGenderError').hide();
-            }
-
-            // Validate date of birth
-            const dobValue = $('#customerDOB').val();
-            if (!dobValue) {
-              e.preventDefault();
-              $('#customerDOBError').show();
-              if (isValid) {
-                $('#customerDOB').focus();
-              }
-              isValid = false;
-            } else {
-              $('#customerDOBError').hide();
-            }
-
-            // Validate time of birth
-            const timeValue = $('#customerTimeOfBirth').val();
-            if (!timeValue) {
-              e.preventDefault();
-              $('#customerTimeError').show();
-              if (isValid) {
-                $('#customerTimeOfBirth').focus();
-              }
-              isValid = false;
-            } else {
-              $('#customerTimeError').hide();
-            }
-
-            // Validate WhatsApp number
-            const whatsappValue = $('#customerWhatsApp').val();
-            if (!whatsappValue.trim()) {
-              e.preventDefault();
-              $('#customerWhatsAppError').show();
-              if (isValid) {
-                $('#customerWhatsApp').focus();
-              }
-              isValid = false;
-            } else {
-              $('#customerWhatsAppError').hide();
-            }
-
-            if (!isValid) {
+            // Use the validation function
+            if (!validateCustomForm()) {
               return false;
             }
           }
 
+          // Get the SKU ID and code directly from the Blade template
+          const skuIdDirect = {{ $sku['id'] ?? 0 }};
+          const skuCode = '{{ $sku["code"] ?? "" }}';
+
+          // Use the direct SKU ID if the data attribute didn't work
+          if (!skuId && skuIdDirect) {
+            skuId = skuIdDirect;
+            console.log('Using SKU ID from Blade template:', skuId);
+          }
+
           // Add customer data if custom is enabled
           const cartData = {
-            skuId,
             quantity,
             isBuyNow
           };
 
+          // Add either sku_id or sku_code depending on what's available
+          if (skuId) {
+            cartData.sku_id = skuId;
+          } else if (skuCode) {
+            cartData.sku_code = skuCode;
+            console.log('Using SKU code instead of ID:', skuCode);
+          }
+
           if ($('.custom-form-container').length > 0) {
-            // Get all custom form data
-            const customData = {
-              customerName: customerName,
-              customerGender: $('input[name="customerGender"]:checked').val(),
-              customerDOB: $('#customerDOB').val(),
-              customerLunarDOB: $('#customerLunarDOB').val(),
-              customerZodiac: $('#customerZodiac').val(),
-              customerTimeOfBirth: $('#customerTimeOfBirth option:selected').text(),
-              customerTimeOfBirthValue: $('#customerTimeOfBirth').val(),
-              customerWhatsApp: $('#customerWhatsApp').val()
-            };
+            // Get all custom form data using our helper function
+            const customData = getCustomFormData();
 
             // Store custom data in localStorage for use during checkout
             localStorage.setItem('customFormData', JSON.stringify(customData));
@@ -682,13 +902,89 @@
             cartData.customerTimeOfBirth = customData.customerTimeOfBirth;
             cartData.customerTimeOfBirthValue = customData.customerTimeOfBirthValue;
             cartData.customerWhatsApp = customData.customerWhatsApp;
+
+            // Add custom_data field directly
+            cartData.custom_data = customData;
+
+            // Log for debugging
+            console.log('Adding to cart with custom data:', customData);
           }
 
-          inno.addCart(cartData, this, function (res) {
-            if (isBuyNow) {
-              window.location.href = '{{ front_route('carts.index') }}';
-            }
-          })
+          // Show loading indicator on the button
+          const $btn = $(this);
+          const originalBtnText = $btn.html();
+          $btn.addClass('disabled').html('<span class="spinner-border spinner-border-sm me-2"></span>' + (isBuyNow ? 'Processing...' : 'Adding...'));
+
+          // Send the data to the server directly instead of using inno.addCart
+          // This gives us more control over the response handling
+          axios.post(urls.cart_add, cartData)
+            .then(function(res) {
+              if (res.success) {
+                // Update cart icon quantity
+                $('.header-cart-icon .icon-quantity').text(res.data.total_format);
+
+                // Show success message
+                layer.msg('<i class="bi bi-check-circle-fill me-2"></i>Custom data saved successfully!', {
+                  time: 2000,
+                  shade: [0.3, '#000']
+                });
+
+                // Show the success badge on the button with animation
+                if (isBuyNow) {
+                  $('#customDataSavedBadge2').fadeIn('fast');
+                  $('.buy-now').addClass('btn-success').removeClass('btn-primary');
+                  setTimeout(function() {
+                    $('.buy-now').addClass('btn-primary').removeClass('btn-success');
+                  }, 1000);
+                } else {
+                  $('#customDataSavedBadge1').fadeIn('fast');
+                  $('.add-cart').addClass('btn-success').removeClass('btn-primary');
+                  setTimeout(function() {
+                    $('.add-cart').addClass('btn-primary').removeClass('btn-success');
+                  }, 1000);
+                }
+
+                // Hide the badge after 5 seconds
+                setTimeout(function() {
+                  $('#customDataSavedBadge1, #customDataSavedBadge2').fadeOut('slow');
+                }, 5000);
+
+                console.log('Custom data saved with cart item:', res.data);
+
+                // If it's Buy Now, redirect to cart page
+                if (isBuyNow) {
+                  setTimeout(function() {
+                    window.location.href = '{{ front_route('carts.index') }}';
+                  }, 1000);
+                }
+              } else {
+                layer.msg('<i class="bi bi-exclamation-triangle-fill me-2"></i>' + (res.message || 'Error adding to cart'), {
+                  time: 3000
+                });
+                console.error('Error saving custom data:', res);
+              }
+            })
+            .catch(function(error) {
+              let errorMessage = 'Unknown error';
+
+              // Extract detailed error message if available
+              if (error.response && error.response.data) {
+                if (error.response.data.message) {
+                  errorMessage = error.response.data.message;
+                }
+              } else if (error.message) {
+                errorMessage = error.message;
+              }
+
+              layer.msg('<i class="bi bi-exclamation-triangle-fill me-2"></i>Error: ' + errorMessage, {
+                time: 3000
+              });
+              console.error('Error saving custom data:', error);
+            })
+            .finally(function() {
+              // Re-enable the button and restore original text
+              $btn.removeClass('disabled').html(originalBtnText);
+            });
         });
       </script>
   @endpush

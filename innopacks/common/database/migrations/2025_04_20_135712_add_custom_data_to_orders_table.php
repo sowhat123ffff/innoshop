@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('orders', function (Blueprint $table) {
-            //
+            if (!Schema::hasColumn('orders', 'custom_data')) {
+                $table->json('custom_data')->nullable()->after('admin_note')->comment('Custom Form Data');
+            }
         });
     }
 
@@ -22,7 +24,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('orders', function (Blueprint $table) {
-            //
+            if (Schema::hasColumn('orders', 'custom_data')) {
+                $table->dropColumn('custom_data');
+            }
         });
     }
 };

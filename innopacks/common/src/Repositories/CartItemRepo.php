@@ -70,6 +70,11 @@ class CartItemRepo extends BaseRepo
             $cart = new CartItem($data);
             $cart->saveOrFail();
         } else {
+            // Update custom_data if provided
+            if (isset($data['custom_data']) && !empty($data['custom_data'])) {
+                $cart->custom_data = $data['custom_data'];
+                $cart->save();
+            }
             $cart->increment('quantity', $data['quantity']);
         }
 
@@ -92,6 +97,29 @@ class CartItemRepo extends BaseRepo
         $customerID = $requestData['customer_id'] ?? 0;
         $guestID    = $requestData['guest_id']    ?? 0;
 
+        // Extract custom form data if available
+        $customData = null;
+
+        // Check if custom_data is directly provided
+        if (isset($requestData['custom_data']) && is_array($requestData['custom_data'])) {
+            $customData = $requestData['custom_data'];
+        } else {
+            // Fallback to individual fields
+            $customFields = [
+                'customerName', 'customerGender', 'customerDOB', 'customerLunarDOB',
+                'customerZodiac', 'customerTimeOfBirth', 'customerTimeOfBirthValue', 'customerWhatsApp'
+            ];
+
+            foreach ($customFields as $field) {
+                if (isset($requestData[$field])) {
+                    if ($customData === null) {
+                        $customData = [];
+                    }
+                    $customData[$field] = $requestData[$field];
+                }
+            }
+        }
+
         return [
             'product_id'  => $sku->product_id,
             'sku_code'    => $sku->code,
@@ -99,6 +127,7 @@ class CartItemRepo extends BaseRepo
             'guest_id'    => $customerID ? '' : $guestID,
             'selected'    => true,
             'quantity'    => (int) ($requestData['quantity'] ?? 1),
+            'custom_data' => $customData,
         ];
     }
 }
