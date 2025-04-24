@@ -71,6 +71,9 @@
       $amount_format = $cartData['amount_format'] ?? '0.00';
     @endphp
     @include('components.cart-offcanvas', ['list' => $list, 'amount_format' => $amount_format])
+
+    <!-- WhatsApp Floating Button -->
+    @include('components.whatsapp-button')
   @endif
 
   @stack('footer')

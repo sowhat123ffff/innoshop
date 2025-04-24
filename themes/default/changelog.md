@@ -2,7 +2,47 @@
 
 This changelog documents all changes made to implement and improve the custom form functionality in the InnoShop platform.
 
-## Latest Changes (26-May-2025)
+## Latest Changes (25-Apr-2025)
+
+### Summary of Changes Made on 25-Apr-2025
+
+In this update, we made several improvements to the website's navigation and customer support features. We fixed the subtitle display in the mobile menu and added a WhatsApp floating button that appears on all customer-facing pages.
+
+### 1. Fixed Mobile Menu Subtitle Display
+
+- Fixed an issue where menu subtitles weren't displaying correctly in the mobile view
+- Added subtitle display under each menu item in the mobile menu
+- Made subtitles clickable with the same link as the main menu item
+- Improved styling and spacing for better readability
+- Added proper alignment and positioning of dropdown icons
+
+### 2. Added WhatsApp Floating Button to All Pages
+
+- Created a reusable WhatsApp button component in `themes/default/views/components/whatsapp-button.blade.php`
+- Added the component to the main layout file (`themes/default/views/layouts/app.blade.php`) so it appears on all pages
+- Implemented a popup with two contact options: "Product Enquiry Hotline" and "Feng Shui Enquiry Hotline"
+- Added smooth animations for opening and closing the popup
+- Made the button toggle the popup (clicking again closes it)
+- Optimized for both desktop and mobile views
+
+### 3. Enhanced User Experience
+
+- Added subtle animations and transitions for a more polished look
+- Implemented proper circular image display for the WhatsApp logo
+- Added visual feedback when the popup is open (button state changes)
+- Made the entire option cards clickable, not just the text
+- Added staggered animations for the options when the popup appears
+- Ensured the floating button follows the user as they scroll
+
+### 4. Technical Improvements
+
+- Organized code into a reusable component for better maintainability
+- Used CSS transitions and transforms for smooth animations
+- Implemented proper event handling for clicks and touch events
+- Added fallback handling for missing images
+- Ensured responsive design works on all screen sizes
+
+## Previous Changes (26-May-2025)
 
 ### Summary of Changes Made on 26-May-2025
 
