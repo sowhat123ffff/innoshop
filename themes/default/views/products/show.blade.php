@@ -45,6 +45,32 @@
     #customerLunarDOB {
       background-color: #f8f9fa;
     }
+    /* Responsive button styles */
+    .product-info-btns {
+      width: 100%;
+    }
+    .product-info-btns .btn {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    @media (max-width: 576px) {
+      .product-info-btns {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+      .product-info-btns > div {
+        flex: 1 0 auto;
+        min-width: 120px;
+        margin-bottom: 10px;
+      }
+      .product-info-btns .btn {
+        width: 100%;
+        padding: 0.5rem;
+        font-size: 0.9rem;
+      }
+    }
   </style>
 @endpush
 
@@ -242,22 +268,7 @@
                 </div>
               </div>
 
-              <!-- Temporary Button for Testing -->
-              <div class="mb-3 text-center">
-                <div class="position-relative d-inline-block w-100">
-                  <button type="button" id="saveCustomDataBtn" class="btn btn-warning btn-lg w-100">
-                    <i class="bi bi-database-add"></i> Add data to database (Test)
-                  </button>
-                  <span id="testDataSavedBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success" style="display: none;">
-                    <i class="bi bi-check-lg"></i>
-                    <span class="visually-hidden">Custom data saved</span>
-                  </span>
-                </div>
-                <div id="customDataSaveResult" class="mt-2" style="display: none;"></div>
-                <div class="form-text small text-muted mt-2">
-                  This button is for testing purposes only. It will save the custom form data to the database without adding the product to your cart.
-                </div>
-              </div>
+
             </div>
             @endif
 
@@ -268,9 +279,9 @@
                 <div class="plus"><i class="bi bi-plus-lg"></i></div>
               </div>
 
-              <div class="product-info-btns">
-                <div class="position-relative d-inline-block">
-                  <button class="btn btn-primary add-cart h-100" data-id="{{ $product->id }}"
+              <div class="product-info-btns d-flex flex-wrap">
+                <div class="position-relative me-2 mb-2 mb-sm-0" style="flex: 1; min-width: 120px;">
+                  <button class="btn btn-primary add-cart w-100" data-id="{{ $product->id }}"
                           data-price="{{ $product->masterSku->price }}" style="height: 50px !important; display: flex; align-items: center; justify-content: center;">
                     {{ __('front/product.add_to_cart') }}
                   </button>
@@ -279,8 +290,8 @@
                     <span class="visually-hidden">Custom data saved</span>
                   </span>
                 </div>
-                <div class="position-relative d-inline-block ms-2">
-                  <button class="btn buy-now h-100" data-id="{{ $product->id }}"
+                <div class="position-relative" style="flex: 1; min-width: 120px;">
+                  <button class="btn buy-now w-100" data-id="{{ $product->id }}"
                           data-price="{{ $product->masterSku->price }}" style="height: 50px !important; display: flex; align-items: center; justify-content: center;">
                     {{ __('front/product.buy_now') }}
                   </button>
@@ -434,7 +445,7 @@
 
         // Function to hide all success badges when form data changes
         function hideSuccessBadges() {
-          $('#customDataSavedBadge1, #customDataSavedBadge2, #testDataSavedBadge').fadeOut('fast');
+          $('#customDataSavedBadge1, #customDataSavedBadge2').fadeOut('fast');
         }
 
         // Hide error message when user starts typing
@@ -705,145 +716,7 @@
           };
         }
 
-        // Handle the "Add data to database" button click
-        $('#saveCustomDataBtn').on('click', function() {
-          // Validate the form
-          if (!validateCustomForm()) {
-            return false;
-          }
 
-          // Get the form data
-          const customData = getCustomFormData();
-          const quantity = $('.product-quantity').val();
-          const skuId = $('.product-quantity').data('sku-id');
-
-          // Debug: Log the SKU ID
-          console.log('SKU ID from data attribute:', skuId);
-
-          // If skuId is undefined or empty, try to get it from other sources
-          if (!skuId) {
-            // Try to get it from the URL or other elements
-            const skuIdFromUrl = new URLSearchParams(window.location.search).get('sku_id');
-            const skuIdFromElement = $('.product-info').data('sku-id') || $('[data-sku-id]').first().data('sku-id');
-
-            console.log('SKU ID from URL:', skuIdFromUrl);
-            console.log('SKU ID from other elements:', skuIdFromElement);
-
-            // Use the first available value
-            if (skuIdFromUrl) {
-              skuId = skuIdFromUrl;
-            } else if (skuIdFromElement) {
-              skuId = skuIdFromElement;
-            } else {
-              // Fallback to the product ID if available
-              skuId = $('.add-cart').data('id') || $('.buy-now').data('id');
-              console.log('Fallback to product ID:', skuId);
-            }
-          }
-
-          // Get the SKU ID and code directly from the Blade template
-          const skuIdDirect = {{ $sku['id'] ?? 0 }};
-          const skuCode = '{{ $sku["code"] ?? "" }}';
-
-          // Use the direct SKU ID if the data attribute didn't work
-          if (!skuId && skuIdDirect) {
-            skuId = skuIdDirect;
-            console.log('Using SKU ID from Blade template:', skuId);
-          }
-
-          // Create the cart data object
-          const cartData = {
-            quantity,
-            isBuyNow: false,
-            custom_data: customData
-          };
-
-          // Add either sku_id or sku_code depending on what's available
-          if (skuId) {
-            cartData.sku_id = skuId;
-          } else if (skuCode) {
-            cartData.sku_code = skuCode;
-            console.log('Using SKU code instead of ID:', skuCode);
-          } else {
-            // Show error if neither is available
-            $('#customDataSaveResult').html('<div class="alert alert-danger"><h5><i class="bi bi-exclamation-triangle-fill me-2"></i>Error</h5>Could not determine SKU ID or code. Please try again or contact support.</div>').show();
-            $('#saveCustomDataBtn').prop('disabled', false).html('<i class="bi bi-database-add"></i> Add data to database (Test)');
-            return false;
-          }
-
-          // Log the data being sent
-          console.log('Sending data to server:', cartData);
-
-          // Show loading indicator
-          $('#saveCustomDataBtn').prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span> Saving...');
-          $('#customDataSaveResult').hide();
-
-          // Send the data to the server
-          axios.post(urls.cart_add, cartData)
-            .then(function(res) {
-              if (res.success) {
-                // Create a more detailed success message
-                let successMsg = '<div class="alert alert-success">' +
-                  '<h5><i class="bi bi-check-circle-fill me-2"></i>Data saved successfully!</h5>' +
-                  '<p class="mb-0">Your custom information has been saved to the database.</p>';
-
-                // Add cart ID if available
-                if (res.data && res.data.list && res.data.list.length > 0) {
-                  const cartItem = res.data.list[0];
-                  successMsg += '<p class="mb-0 mt-2"><small>Cart Item ID: ' + cartItem.id + '</small></p>';
-                }
-
-                successMsg += '</div>';
-
-                $('#customDataSaveResult').html(successMsg).show();
-
-                // Show the success badge with animation
-                $('#testDataSavedBadge').fadeIn('fast');
-                $('#saveCustomDataBtn').addClass('btn-success').removeClass('btn-warning');
-                setTimeout(function() {
-                  $('#saveCustomDataBtn').addClass('btn-warning').removeClass('btn-success');
-                }, 1000);
-
-                // Hide the badge after 5 seconds
-                setTimeout(function() {
-                  $('#testDataSavedBadge').fadeOut('slow');
-                }, 5000);
-
-                console.log('Custom data saved:', res.data);
-              } else {
-                $('#customDataSaveResult').html('<div class="alert alert-danger">Error: ' + (res.message || 'Unknown error') + '</div>').show();
-                console.error('Error saving custom data:', res);
-              }
-            })
-            .catch(function(error) {
-              let errorMessage = 'Unknown error';
-
-              // Extract detailed error message if available
-              if (error.response && error.response.data) {
-                if (error.response.data.message) {
-                  errorMessage = error.response.data.message;
-                }
-
-                // If there are validation errors, show them in detail
-                if (error.response.data.errors) {
-                  errorMessage += '<ul class="mt-2 mb-0">';
-                  for (const field in error.response.data.errors) {
-                    errorMessage += '<li>' + error.response.data.errors[field][0] + '</li>';
-                  }
-                  errorMessage += '</ul>';
-                }
-              } else if (error.message) {
-                errorMessage = error.message;
-              }
-
-              $('#customDataSaveResult').html('<div class="alert alert-danger"><h5><i class="bi bi-exclamation-triangle-fill me-2"></i>Error</h5>' + errorMessage + '</div>').show();
-              console.error('Error saving custom data:', error);
-            })
-            .finally(function() {
-              // Re-enable the button
-              $('#saveCustomDataBtn').prop('disabled', false).html('<i class="bi bi-database-add"></i> Add data to database (Test)');
-            });
-        });
 
         $('.add-cart, .buy-now').on('click', function (e) {
           const quantity = $('.product-quantity').val();

@@ -6,6 +6,84 @@ This changelog documents all changes made to implement and improve the custom fo
 
 ### Summary of Changes Made on 25-Apr-2025
 
+In this update, we made several UI improvements to enhance the mobile experience. We fixed issues with the "Add to Cart" and "Buy Now" buttons in mobile view and improved the positioning of the "Add to Wish List" button to prevent it from blocking product images.
+
+### 1. Fixed "Add to Cart" and "Buy Now" Buttons in Mobile View (themes/default/views/products/show.blade.php)
+
+- Restructured the product-info-btns container using flex layout for better responsiveness
+- Added minimum width constraints to ensure buttons don't get too small on mobile screens
+- Implemented responsive CSS to adjust button sizing and spacing on different screen sizes
+- Added proper vertical alignment and centering for button content
+- Improved button text display with proper overflow handling
+- Removed the temporary testing button that was no longer needed
+
+```html
+<div class="product-info-btns d-flex flex-wrap">
+  <div class="position-relative me-2 mb-2 mb-sm-0" style="flex: 1; min-width: 120px;">
+    <button class="btn btn-primary add-cart w-100" data-id="{{ $product->id }}"
+            data-price="{{ $product->masterSku->price }}" style="height: 50px !important; display: flex; align-items: center; justify-content: center;">
+      {{ __('front/product.add_to_cart') }}
+    </button>
+  </div>
+  <!-- Buy Now button with similar improvements -->
+</div>
+```
+
+### 2. Improved "Add to Wish List" Button Positioning (plugins/CustomPlugin/Boot.php)
+
+- Redesigned the wishlist button to be a small circular icon in the corner of product images
+- Added custom CSS class for targeted styling without affecting other site elements
+- Implemented responsive positioning that works well on both desktop and mobile screens
+- Hid the "Add to Wish List" text on mobile, showing only the heart icon to save space
+- Added subtle background and shadow for better visibility against different product images
+- Made the button smaller on mobile screens to prevent it from blocking product images
+
+```html
+<div class="wishlist-container add-wishlist custom-wishlist-btn" data-in-wishlist="" data-id="{{ $productId }}" data-price="{{ $productPrice }}">
+  <i class="bi bi-heart"></i> <span class="wishlist-text">Add to Wish List</span>
+</div>
+```
+
+```css
+/* Wishlist button styling */
+.custom-wishlist-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  z-index: 5;
+}
+
+/* Mobile-specific adjustments */
+@media (max-width: 767px) {
+  .custom-wishlist-btn {
+    width: 30px;
+    height: 30px;
+    top: 5px;
+    right: 5px;
+  }
+}
+```
+
+### 3. Benefits of the Changes
+
+- Improved mobile user experience with properly sized and positioned buttons
+- Eliminated UI issues where the wishlist button was blocking product images
+- Enhanced visual consistency across different screen sizes
+- Better touch targets for mobile users
+- More efficient use of screen space on smaller devices
+
+## Previous Changes (25-Apr-2025)
+
+### Summary of Changes Made on 25-Apr-2025
+
 In this update, we made several improvements to the website's navigation and customer support features. We fixed the subtitle display in the mobile menu and added a WhatsApp floating button that appears on all customer-facing pages.
 
 ### 1. Fixed Mobile Menu Subtitle Display

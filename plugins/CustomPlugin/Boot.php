@@ -502,8 +502,8 @@ class Boot
                             <a href="' . $productUrl . '">
                               <img src="' . $product->image . '" class="img-fluid">
                             </a>
-                            <div class="wishlist-container add-wishlist" data-in-wishlist="" data-id="' . $productId . '" data-price="' . $productPrice . '">
-                              <i class="bi bi-heart"></i> Add to Wish List
+                            <div class="wishlist-container add-wishlist custom-wishlist-btn" data-in-wishlist="" data-id="' . $productId . '" data-price="' . $productPrice . '">
+                              <i class="bi bi-heart"></i> <span class="wishlist-text">Add to Wish List</span>
                             </div>
                           </div>
                           <div class="product-item-info">
@@ -620,6 +620,37 @@ class Boot
             line-height: 1.4;
           }
 
+          /* Wishlist button styling */
+          .custom-wishlist-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 5;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+          }
+
+          .custom-wishlist-btn i {
+            font-size: 18px;
+            color: #333;
+          }
+
+          .wishlist-text {
+            display: none;
+          }
+
+          .custom-wishlist-btn:hover {
+            background-color: rgba(255, 255, 255, 0.9);
+          }
+
           .slider-nav {
             position: absolute;
             top: 50%;
@@ -647,6 +678,18 @@ class Boot
           @media (max-width: 767px) {
             .product-slider-item {
               flex: 0 0 33.333%;
+            }
+
+            /* Adjust wishlist button for mobile */
+            .custom-wishlist-btn {
+              width: 30px;
+              height: 30px;
+              top: 5px;
+              right: 5px;
+            }
+
+            .custom-wishlist-btn i {
+              font-size: 16px;
             }
           }
         </style>';
