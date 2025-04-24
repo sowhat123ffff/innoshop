@@ -270,8 +270,8 @@
 
               <div class="product-info-btns">
                 <div class="position-relative d-inline-block">
-                  <button class="btn btn-primary add-cart" data-id="{{ $product->id }}"
-                          data-price="{{ $product->masterSku->price }}">
+                  <button class="btn btn-primary add-cart h-100" data-id="{{ $product->id }}"
+                          data-price="{{ $product->masterSku->price }}" style="height: 50px !important; display: flex; align-items: center; justify-content: center;">
                     {{ __('front/product.add_to_cart') }}
                   </button>
                   <span id="customDataSavedBadge1" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success" style="display: none;">
@@ -280,8 +280,8 @@
                   </span>
                 </div>
                 <div class="position-relative d-inline-block ms-2">
-                  <button class="btn buy-now" data-id="{{ $product->id }}"
-                          data-price="{{ $product->masterSku->price }}">
+                  <button class="btn buy-now h-100" data-id="{{ $product->id }}"
+                          data-price="{{ $product->masterSku->price }}" style="height: 50px !important; display: flex; align-items: center; justify-content: center;">
                     {{ __('front/product.buy_now') }}
                   </button>
                   <span id="customDataSavedBadge2" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success" style="display: none;">
@@ -923,39 +923,29 @@
                 // Update cart icon quantity
                 $('.header-cart-icon .icon-quantity').text(res.data.total_format);
 
-                // Show success message
-                layer.msg('<i class="bi bi-check-circle-fill me-2"></i>Custom data saved successfully!', {
-                  time: 2000,
-                  shade: [0.3, '#000']
-                });
+                console.log('Custom data saved with cart item:', res.data);
 
-                // Show the success badge on the button with animation
+                // If it's Buy Now, redirect to cart page immediately without showing any message
                 if (isBuyNow) {
-                  $('#customDataSavedBadge2').fadeIn('fast');
-                  $('.buy-now').addClass('btn-success').removeClass('btn-primary');
-                  setTimeout(function() {
-                    $('.buy-now').addClass('btn-primary').removeClass('btn-success');
-                  }, 1000);
+                  window.location.href = '{{ front_route('carts.index') }}';
                 } else {
+                  // Only show success message and badge for Add to Cart
+                  layer.msg('<i class="bi bi-check-circle-fill me-2"></i>Add to cart successfully!', {
+                    time: 1000,
+                    shade: [0.2, '#000'] //shadow layer
+                  });
+
+                  // Show the success badge on the Add to Cart button
                   $('#customDataSavedBadge1').fadeIn('fast');
                   $('.add-cart').addClass('btn-success').removeClass('btn-primary');
                   setTimeout(function() {
                     $('.add-cart').addClass('btn-primary').removeClass('btn-success');
                   }, 1000);
-                }
 
-                // Hide the badge after 5 seconds
-                setTimeout(function() {
-                  $('#customDataSavedBadge1, #customDataSavedBadge2').fadeOut('slow');
-                }, 5000);
-
-                console.log('Custom data saved with cart item:', res.data);
-
-                // If it's Buy Now, redirect to cart page
-                if (isBuyNow) {
+                  // Hide the badge after 5 seconds
                   setTimeout(function() {
-                    window.location.href = '{{ front_route('carts.index') }}';
-                  }, 1000);
+                    $('#customDataSavedBadge1').fadeOut('slow');
+                  }, 5000);
                 }
               } else {
                 layer.msg('<i class="bi bi-exclamation-triangle-fill me-2"></i>' + (res.message || 'Error adding to cart'), {
