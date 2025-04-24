@@ -223,8 +223,13 @@
         <div class="accordion accordion-flush" id="menu-accordion">
           <div class="accordion-item">
             <div class="nav-item-text">
-              <a class="nav-link {{ equal_route_name('home.index') ? 'active' : '' }}" aria-current="page"
-                 href="{{ front_route('home.index') }}">{{ __('front/common.home') }}</a>
+              <div class="mobile-menu-title-wrapper">
+                <a class="nav-link {{ equal_route_name('home.index') ? 'active' : '' }}" aria-current="page"
+                   href="{{ front_route('home.index') }}">{{ __('front/common.home') }}</a>
+                <a class="mobile-menu-subtitle" href="{{ front_route('home.index') }}">
+                  Home Page
+                </a>
+              </div>
             </div>
           </div>
 
@@ -233,10 +238,33 @@
             @if ($menu['name'])
               <div class="accordion-item">
                 <div class="nav-item-text">
-                  <a class="nav-link" href="{{ $menu['url'] }}"
-                     data-bs-toggle="{{ !$menu['url'] ? 'collapse' : '' }}">
-                    {{ $menu['name'] }}
-                  </a>
+                  <div class="mobile-menu-title-wrapper">
+                    <a class="nav-link" href="{{ $menu['url'] }}"
+                       data-bs-toggle="{{ !$menu['url'] ? 'collapse' : '' }}">
+                      {{ $menu['name'] }}
+                    </a>
+                    <a class="mobile-menu-subtitle" href="{{ $menu['url'] }}">
+                      @if ($menu['name'] === '开运饰品')
+                        Fortune Accessories
+                      @elseif ($menu['name'] === '代烧')
+                        Burn On Behalf
+                      @elseif ($menu['name'] === '风水产品')
+                        Feng Shui Products
+                      @elseif ($menu['name'] === '法会')
+                        Praying Ceremony
+                      @elseif ($menu['name'] === '神料')
+                        Praying Supplies
+                      @elseif ($menu['name'] === '风水服务')
+                        Feng Shui Services
+                      @elseif ($menu['name'] === '风水资讯')
+                        Feng Shui Info
+                      @elseif ($menu['name'] === '关于我们')
+                        About Us
+                      @else
+                        Default Subtitle
+                      @endif
+                    </a>
+                  </div>
                   @if (isset($menu['children']) && $menu['children'])
                     <span class="collapsed" data-bs-toggle="collapse"
                           data-bs-target="#flush-menu-{{ $key }}"><i class="bi bi-chevron-down"></i></span>
@@ -322,6 +350,49 @@
   }
   .navbar-nav .nav-item {
     margin: 0 7px;
+  }
+
+  /* Mobile menu title and subtitle styles */
+  .mobile-menu-title-wrapper {
+    display: flex;
+    flex-direction: column;
+    padding-right: 30px; /* Space for dropdown arrow */
+  }
+
+  .mobile-menu-subtitle {
+    font-size: 12px;
+    color: #888;
+    margin-top: 0;
+    padding-left: 2px;
+    line-height: 1.2;
+    text-decoration: none;
+    display: block;
+  }
+
+  .mobile-menu-subtitle:hover {
+    color: #333;
+    text-decoration: none;
+  }
+
+  /* Adjust mobile menu item spacing and styling */
+  #mobile-menu-offcanvas .nav-item-text {
+    padding: 10px 0;
+    position: relative;
+    display: flex;
+  }
+
+  #mobile-menu-offcanvas .nav-item-text .nav-link {
+    margin-bottom: 2px;
+    font-weight: 600;
+    padding: 0;
+  }
+
+  #mobile-menu-offcanvas .collapsed {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1;
   }
 
   /* Search icon and popup styles */
