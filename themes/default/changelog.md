@@ -2,7 +2,50 @@
 
 This changelog documents all changes made to implement and improve the custom form functionality in the InnoShop platform.
 
-## Latest Changes (24-Apr-2025)
+## Latest Changes (25-May-2025)
+
+### Summary of Changes Made on 25-May-2025
+
+In this update, we fixed a critical issue with custom-enabled products in the cart. Previously, when a customer added the same product multiple times with different custom information, only the last custom information was saved, and the previous ones were lost. Now, each product with custom form data is treated as a unique item in the cart.
+
+### 1. Fixed Cart Item Stacking Issue (innopacks/common/src/Repositories/CartItemRepo.php)
+
+```php
+// Check if the product has custom_enabled and custom_data
+$hasCustomData = isset($data['custom_data']) && !empty($data['custom_data']);
+$isCustomEnabled = false;
+
+// Get the product to check if custom_enabled is true
+if ($hasCustomData) {
+    $sku = Sku::query()->where('code', $data['sku_code'])->first();
+    if ($sku && $sku->product) {
+        $isCustomEnabled = (bool)$sku->product->custom_enabled;
+    }
+}
+
+// If product has custom_enabled=true and custom_data is provided, always create a new cart item
+if ($isCustomEnabled && $hasCustomData) {
+    $cart = new CartItem($data);
+    $cart->saveOrFail();
+} else {
+    // Standard behavior for non-custom products
+    // ...
+}
+```
+
+- Modified the `CartItemRepo::create()` method to check if a product has `custom_enabled=true`
+- When a product has `custom_enabled=true` and custom form data is provided, the system now creates a new cart item instead of incrementing the quantity
+- This ensures that each custom form submission creates a separate cart item with its own unique custom data
+- Regular products (without custom forms) continue to stack quantities as before
+
+### 2. Benefits of the Change
+
+- When a customer buys multiple of the same product with different custom information, each set of custom information is now preserved
+- Each product instance with custom data appears as a separate item in the cart with quantity=1
+- All custom form data is properly saved to the database and displayed in the admin panel
+- This prevents data loss when customers need to order multiple instances of the same product with different custom information
+
+## Previous Changes (24-Apr-2025)
 
 ### Summary of Changes Made on 24-Apr-2025
 

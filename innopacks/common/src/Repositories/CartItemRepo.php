@@ -65,17 +65,36 @@ class CartItemRepo extends BaseRepo
             'guest_id'    => $data['guest_id'],
         ];
 
-        $cart = $this->builder($filters)->first();
-        if (empty($cart)) {
+        // Check if the product has custom_enabled and custom_data
+        $hasCustomData = isset($data['custom_data']) && !empty($data['custom_data']);
+        $isCustomEnabled = false;
+
+        // Get the product to check if custom_enabled is true
+        if ($hasCustomData) {
+            $sku = Sku::query()->where('code', $data['sku_code'])->first();
+            if ($sku && $sku->product) {
+                $isCustomEnabled = (bool)$sku->product->custom_enabled;
+            }
+        }
+
+        // If product has custom_enabled=true and custom_data is provided, always create a new cart item
+        if ($isCustomEnabled && $hasCustomData) {
             $cart = new CartItem($data);
             $cart->saveOrFail();
         } else {
-            // Update custom_data if provided
-            if (isset($data['custom_data']) && !empty($data['custom_data'])) {
-                $cart->custom_data = $data['custom_data'];
-                $cart->save();
+            // Standard behavior for non-custom products
+            $cart = $this->builder($filters)->first();
+            if (empty($cart)) {
+                $cart = new CartItem($data);
+                $cart->saveOrFail();
+            } else {
+                // Update custom_data if provided
+                if ($hasCustomData) {
+                    $cart->custom_data = $data['custom_data'];
+                    $cart->save();
+                }
+                $cart->increment('quantity', $data['quantity']);
             }
-            $cart->increment('quantity', $data['quantity']);
         }
 
         return $cart;
