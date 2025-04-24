@@ -37,7 +37,7 @@ return [
         'default'   => '',
         'help_key'  => 'CustomPlugin::common.product_ids_help'
     ],
-    
+
     // 第二个产品区块
     [
         'name'      => 'enable_custom_section_2',
@@ -74,7 +74,7 @@ return [
         'default'   => '',
         'help_key'  => 'CustomPlugin::common.product_ids_help'
     ],
-    
+
     // 第三个产品区块
     [
         'name'      => 'enable_custom_section_3',
@@ -110,5 +110,79 @@ return [
         'required'  => false,
         'default'   => '',
         'help_key'  => 'CustomPlugin::common.product_ids_help'
+    ],
+
+    // 第四个产品区块
+    [
+        'name'      => 'enable_custom_section_4',
+        'label_key' => 'CustomPlugin::common.enable_custom_section_4',
+        'type'      => 'bool',
+        'required'  => false,
+        'default'   => false
+    ],
+    [
+        'name'      => 'section_title_4',
+        'label_key' => 'CustomPlugin::common.section_title_4',
+        'type'      => 'multi-string',
+        'required'  => false,
+        'default'   => [
+            'en' => 'Recommended Products',
+            'zh_cn' => '推荐产品'
+        ]
+    ],
+    [
+        'name'      => 'section_subtitle_4',
+        'label_key' => 'CustomPlugin::common.section_subtitle_4',
+        'type'      => 'multi-string',
+        'required'  => false,
+        'default'   => [
+            'en' => 'Products we recommend for you',
+            'zh_cn' => '我们为您推荐的产品'
+        ]
+    ],
+    [
+        'name'      => 'product_ids_4',
+        'label_key' => 'CustomPlugin::common.product_ids_4',
+        'type'      => 'textarea',
+        'required'  => false,
+        'default'   => '',
+        'help_key'  => 'CustomPlugin::common.product_ids_help'
+    ],
+
+    // 第五个产品区块
+    [
+        'name'      => 'enable_custom_section_5',
+        'label_key' => 'CustomPlugin::common.enable_custom_section_5',
+        'type'      => 'bool',
+        'required'  => false,
+        'default'   => false
+    ],
+    [
+        'name'      => 'section_title_5',
+        'label_key' => 'CustomPlugin::common.section_title_5',
+        'type'      => 'multi-string',
+        'required'  => false,
+        'default'   => [
+            'en' => 'Special Products',
+            'zh_cn' => '特别产品'
+        ]
+    ],
+    [
+        'name'      => 'section_subtitle_5',
+        'label_key' => 'CustomPlugin::common.section_subtitle_5',
+        'type'      => 'multi-string',
+        'required'  => false,
+        'default'   => [
+            'en' => 'Unique items for special occasions',
+            'zh_cn' => '特殊场合的独特产品'
+        ]
+    ],
+    [
+        'name'      => 'product_ids_5',
+        'label_key' => 'CustomPlugin::common.product_ids_5',
+        'type'      => 'textarea',
+        'required'  => false,
+        'default'   => '',
+        'help_key'  => 'CustomPlugin::common.product_ids_help'
     ]
-]; 
+];

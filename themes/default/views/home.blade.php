@@ -51,6 +51,10 @@
 
   @hookinsert('home.content.bottom3')
 
+  @hookinsert('home.content.bottom4')
+
+  @hookinsert('home.content.bottom5')
+
     @hookinsert('home.swiper.after')
 
     @if (0)

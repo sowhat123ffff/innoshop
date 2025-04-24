@@ -57,6 +57,12 @@ class Boot
         // 在首页添加自定义产品区块3
         $this->setupProductSection(3);
 
+        // 在首页添加自定义产品区块4
+        $this->setupProductSection(4);
+
+        // 在首页添加自定义产品区块5
+        $this->setupProductSection(5);
+
         // 添加产品选择面板的钩子（在产品编辑页面）
         listen_blade_insert('panel.product.edit.tab.nav.bottom', function ($data) {
             return '
@@ -97,6 +103,20 @@ class Boot
                       <input class="form-check-input" type="checkbox" id="add-to-section-3">
                       <label class="form-check-label" for="add-to-section-3">
                         ' . trans('CustomPlugin::common.enable_custom_section_3') . ' (' . $this->getMultiLangSetting('section_title_3', 'Custom Products 3') . ')
+                      </label>
+                    </div>
+
+                    <div class="form-check my-3">
+                      <input class="form-check-input" type="checkbox" id="add-to-section-4">
+                      <label class="form-check-label" for="add-to-section-4">
+                        ' . trans('CustomPlugin::common.enable_custom_section_4') . ' (' . $this->getMultiLangSetting('section_title_4', 'Custom Products 4') . ')
+                      </label>
+                    </div>
+
+                    <div class="form-check my-3">
+                      <input class="form-check-input" type="checkbox" id="add-to-section-5">
+                      <label class="form-check-label" for="add-to-section-5">
+                        ' . trans('CustomPlugin::common.enable_custom_section_5') . ' (' . $this->getMultiLangSetting('section_title_5', 'Custom Products 5') . ')
                       </label>
                     </div>
 
@@ -144,6 +164,8 @@ class Boot
                             if(data.section1) document.getElementById("add-to-section-1").checked = true;
                             if(data.section2) document.getElementById("add-to-section-2").checked = true;
                             if(data.section3) document.getElementById("add-to-section-3").checked = true;
+                            if(data.section4) document.getElementById("add-to-section-4").checked = true;
+                            if(data.section5) document.getElementById("add-to-section-5").checked = true;
                           } catch(e) {
                             console.error("Error loading product section data:", e);
                           }
@@ -154,6 +176,8 @@ class Boot
                           const section1 = document.getElementById("add-to-section-1").checked;
                           const section2 = document.getElementById("add-to-section-2").checked;
                           const section3 = document.getElementById("add-to-section-3").checked;
+                          const section4 = document.getElementById("add-to-section-4").checked;
+                          const section5 = document.getElementById("add-to-section-5").checked;
 
                           try {
                             const response = await fetch(urls.base_url + "/plugins/CustomPlugin/save-product-sections", {
@@ -166,7 +190,9 @@ class Boot
                                 productId,
                                 section1,
                                 section2,
-                                section3
+                                section3,
+                                section4,
+                                section5
                               })
                             });
 

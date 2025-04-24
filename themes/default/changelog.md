@@ -2,7 +2,43 @@
 
 This changelog documents all changes made to implement and improve the custom form functionality in the InnoShop platform.
 
-## Latest Changes (25-May-2025)
+## Latest Changes (26-May-2025)
+
+### Summary of Changes Made on 26-May-2025
+
+In this update, we added support for two additional product sections (4 and 5) on the homepage, allowing for more flexible product displays and marketing opportunities.
+
+### 1. Added New Hook Inserts (themes/default/views/home.blade.php)
+
+- Added `@hookinsert('home.content.bottom4')` and `@hookinsert('home.content.bottom5')` in the home.blade.php file
+- These hooks allow for additional product sections to be displayed on the homepage
+- Maintained consistent spacing and formatting with existing hook inserts
+
+### 2. Extended Product Section Support (plugins/CustomPlugin/Boot.php)
+
+- Added calls to `$this->setupProductSection(4)` and `$this->setupProductSection(5)` in the init method
+- Added checkboxes for sections 4 and 5 in the admin panel product edit page
+- Updated the JavaScript code to handle the new sections:
+  - Added checks for section4 and section5 in the initialization
+  - Added variables to capture section4 and section5 checkbox states
+  - Updated the JSON data sent to the server to include section4 and section5
+
+### 3. Added Configuration Fields (plugins/CustomPlugin/fields.php)
+
+- Added configuration options for sections 4 and 5, including:
+  - Enable/disable toggles for each section
+  - Title and subtitle fields with default values in English and Chinese
+  - Product ID text areas for specifying which products should appear in each section
+- Followed the same pattern as existing sections 1-3 for consistency
+
+### 4. Benefits of the Changes
+
+- More flexible homepage layout with up to 5 distinct product sections
+- Ability to showcase different product categories or collections
+- Enhanced marketing capabilities for special promotions or seasonal items
+- Consistent user experience for both customers and administrators
+
+## Previous Changes (25-May-2025)
 
 ### Summary of Changes Made on 25-May-2025
 
