@@ -63,7 +63,7 @@
     position: relative;
     will-change: transform, box-shadow;
     overflow: hidden; /* Ensure image is clipped to circle */
-    padding: 0; /* Remove padding to make logo bigger */
+    padding: 0px; /* Remove padding to make logo bigger */
   }
 
   .whatsapp-float a:hover {
