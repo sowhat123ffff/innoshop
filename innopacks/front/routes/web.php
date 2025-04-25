@@ -131,6 +131,10 @@ Route::prefix('account')
         Route::put('/addresses/{address}', [Account\AddressesController::class, 'update'])->name('addresses.update');
         Route::delete('/addresses/{address}', [Account\AddressesController::class, 'destroy'])->name('addresses.destroy');
 
+        // Member Data API (must come before the route with parameter)
+        // This route is accessible without authentication middleware
+        Route::get('/member_data/api/get', [Account\MemberDataApiController::class, 'getMemberData'])->withoutMiddleware(['customer_auth:customer'])->name('member_data.api.get');
+
         // Member Data
         Route::get('/member_data', [Account\MemberDataController::class, 'index'])->name('member_data.index');
         Route::get('/member_data/create', [Account\MemberDataController::class, 'create'])->name('member_data.create');

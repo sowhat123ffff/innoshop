@@ -6,7 +6,7 @@ This changelog documents all changes made to implement and improve the custom fo
 
 ### Summary of Changes Made on 26-Apr-2025
 
-In this update, we made several improvements to the Member Data functionality and fixed issues with the help popup and form validation. We also documented the initial implementation of the Member Data feature, which allows customers to save and reuse personal information across multiple purchases. Additionally, we fixed an issue with HTML tags displaying in product names on the favorites page.
+In this update, we made several improvements to the Member Data functionality and fixed issues with the help popup and form validation. We also documented the initial implementation of the Member Data feature, which allows customers to save and reuse personal information across multiple purchases. Additionally, we fixed an issue with HTML tags displaying in product names on the favorites page. We also implemented a new feature that allows customers to select from their saved Member Data records when filling out custom product forms.
 
 ### 1. Implemented Accordion-Style Q&A in Member Data Help Popup (themes/default/views/account/member_data/index.blade.php)
 
@@ -99,7 +99,71 @@ class MemberData extends BaseModel
 }
 ```
 
-### 4. Fixed HTML Tags in Product Names (themes/default/views/account/favorites.blade.php)
+### 4. Implemented Member Data Selection in Product Forms (themes/default/views/products/show.blade.php)
+
+- Added a dropdown that appears when customers click on the name field in custom product forms
+- The dropdown displays all of the customer's saved Member Data records
+- When a record is selected, all form fields (name, gender, zodiac, birth date, time of birth, WhatsApp) are automatically filled
+- Implemented AJAX loading of Member Data records from the customer's account
+- Added smooth animations and styling for the dropdown interface
+- Modified the ProductController to include Member Data directly in the view data
+- Replaced AJAX request with direct access to view data for better reliability and performance
+- Added server-side logging for better debugging
+- Added conditional messages based on user login status
+- Added a "Create New Member Data" button for users with no saved records
+- Standardized birth time options between product page and member data form
+- Added "吉时（如不懂出生时辰）" option to both forms for users who don't know their birth time
+- Simplified the time of birth selection in the JavaScript code
+- Removed test data for non-logged-in users to ensure proper login messages are displayed
+- Added a "Cancel" button to the Member Data dropdown for easier closing
+- Removed scrollbar from Member Data dropdown to show all records at once
+
+```javascript
+// Function to load member data records from the view data
+function fetchMemberData() {
+  // Get member data from the view data
+  const memberData = @json($member_data ?? []);
+
+  // Check if we have member data records
+  if (memberData && memberData.length > 0) {
+    // Process each member data record
+    memberData.forEach(function(record) {
+      // Create a member data item element
+      const item = $('<div class="member-data-item" data-id="' + record.id + '"></div>');
+      item.append('<div class="member-data-item-name">' + record.name + '</div>');
+      item.append('<div class="member-data-item-details">' + record.gender + ' | ' + record.zodiac + '</div>');
+
+      // Store all data as data attributes
+      item.data('member-data', {
+        name: record.name,
+        gender: record.gender,
+        zodiac: record.zodiac,
+        birthDate: record.birth_date,
+        lunarDate: record.lunar_date,
+        birthTime: record.birth_time,
+        whatsapp: record.whatsapp
+      });
+
+      // Add click event to select this member data
+      item.on('click', function() {
+        selectMemberData($(this).data('member-data'));
+      });
+    });
+  } else {
+    // Check if user is logged in
+    @if(current_customer_id())
+      memberDataList.html('<div class="no-member-data">No saved member data records found.<br>' +
+        '<a href="{{ account_route('member_data.create') }}" class="btn btn-sm btn-primary mt-2">' +
+        'Create New Member Data</a></div>');
+    @else
+      memberDataList.html('<div class="no-member-data">Please <a href="{{ front_route('login.index') }}">' +
+        'log in</a> to access your saved member data.</div>');
+    @endif
+  }
+}
+```
+
+### 5. Fixed HTML Tags in Product Names (themes/default/views/account/favorites.blade.php)
 
 - Fixed an issue where HTML tags (like `<br>`) were displaying as plain text in product names on the favorites page
 - Changed the template to properly render HTML content in product names using the `{!! !!}` syntax instead of `{{ }}`
@@ -113,7 +177,7 @@ class MemberData extends BaseModel
 <div class="product-name"><a href="{{ $product->url }}">{!! $product->translation->name !!}</a></div>
 ```
 
-### 5. Benefits of the Changes
+### 6. Benefits of the Changes
 
 - Improved user experience with a cleaner, more interactive help popup
 - Enhanced bilingual support with Chinese characters for gender and zodiac fields
@@ -124,6 +188,9 @@ class MemberData extends BaseModel
 - Reduced data entry time for returning customers
 - Improved accuracy of customer information with proper validation
 - Enhanced support for Chinese language and cultural elements (zodiac, lunar calendar)
+- Simplified the product form filling process by allowing customers to reuse their saved Member Data
+- Reduced data entry errors by auto-filling form fields with validated Member Data
+- Improved conversion rates by making the checkout process faster and more convenient
 
 ## Previous Changes (25-Apr-2025)
 

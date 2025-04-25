@@ -54,6 +54,67 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
+    /* Member Data Dropdown Styles */
+    .member-data-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background-color: #fff;
+      border: 1px solid #ced4da;
+      border-radius: 0.25rem;
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+      z-index: 1050;
+    }
+
+    .member-data-dropdown-header {
+      padding: 0.5rem 1rem;
+      background-color: #f8f9fa;
+      border-bottom: 1px solid #dee2e6;
+    }
+
+    .member-data-dropdown-body {
+      padding: 0.5rem 0;
+    }
+
+    .member-data-loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .member-data-item {
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .member-data-item:hover {
+      background-color: #f8f9fa;
+    }
+
+    .member-data-item-name {
+      font-weight: 600;
+    }
+
+    .member-data-item-details {
+      font-size: 0.875rem;
+      color: #6c757d;
+    }
+
+    .no-member-data {
+      padding: 1rem;
+      text-align: center;
+      color: #6c757d;
+    }
+
+    .member-data-dropdown-footer {
+      padding: 0.5rem;
+      border-top: 1px solid #dee2e6;
+      background-color: #f8f9fa;
+    }
+
     @media (max-width: 576px) {
       .product-info-btns {
         display: flex;
@@ -165,7 +226,26 @@
               <!-- Name Field -->
               <div class="mb-3 custom-name-form">
                 <label for="customerName" class="form-label">姓名 (中文原名) Name (Chinese Original Name) <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" id="customerName" placeholder="请输入您的中文姓名 / Please enter your Chinese name" required>
+                <div class="position-relative">
+                  <input type="text" class="form-control" id="customerName" placeholder="请输入您的中文姓名 / Please enter your Chinese name" required>
+                  <div class="member-data-dropdown" style="display: none;">
+                    <div class="member-data-dropdown-header">
+                      <strong>Member Data Records</strong>
+                    </div>
+                    <div class="member-data-dropdown-body">
+                      <div class="member-data-loading">
+                        <div class="spinner-border spinner-border-sm text-primary" role="status">
+                          <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <span class="ms-2">Loading your saved records...</span>
+                      </div>
+                      <div class="member-data-list"></div>
+                    </div>
+                    <div class="member-data-dropdown-footer">
+                      <button type="button" class="btn btn-sm btn-secondary w-100 member-data-cancel">Cancel</button>
+                    </div>
+                  </div>
+                </div>
                 <div class="invalid-feedback" id="customerNameError" style="display: none;">
                   Must fill in the box / 必须填写此栏位
                 </div>
@@ -239,20 +319,19 @@
                 <label for="customerTimeOfBirth" class="form-label">出生时间 Time Of Birth <span class="text-danger">*</span></label>
                 <select class="form-select" id="customerTimeOfBirth" required>
                   <option value="" selected>请选择 / Please select</option>
-                  <option value="18139">吉时 (如不清出生时辰) Unknown time</option>
-                  <option value="18140">早子时（ 12:00am - 12:59am ）Early Rat (12:00am - 12:59am)</option>
-                  <option value="18141">丁丑时（ 01:00am - 02:59am ）Ox (01:00am - 02:59am)</option>
-                  <option value="18142">丙寅时（ 03:00am - 04:59am ）Tiger (03:00am - 04:59am)</option>
-                  <option value="18143">午卯时（ 05:00am - 06:59am ）Rabbit (05:00am - 06:59am)</option>
-                  <option value="18144">戊辰时（ 07:00am - 08:59am ）Dragon (07:00am - 08:59am)</option>
-                  <option value="18145">己巳时（ 09:00am - 10:59am ）Snake (09:00am - 10:59am)</option>
-                  <option value="18146">庚午时（ 11:00am - 12:59pm ）Horse (11:00am - 12:59pm)</option>
-                  <option value="18147">辛未时（ 01:00pm - 02:59pm ）Goat (01:00pm - 02:59pm)</option>
-                  <option value="18148">壬申时（ 03:00pm - 04:59pm ）Monkey (03:00pm - 04:59pm)</option>
-                  <option value="18149">癸酉时（ 05:00pm - 06:59pm ）Rooster (05:00pm - 06:59pm)</option>
-                  <option value="18150">癸戌时（ 07:00pm - 08:59pm ）Dog (07:00pm - 08:59pm)</option>
-                  <option value="18151">癸亥时（ 09:00pm - 10:59pm ）Pig (09:00pm - 10:59pm)</option>
-                  <option value="18152">夜子时（ 11:00pm - 11:59pm ）Late Rat (11:00pm - 11:59pm)</option>
+                  <option value="吉时（如不懂出生时辰）">吉时（如不懂出生时辰）</option>
+                  <option value="子时 ( 11:00pm - 00:59am )">子时 ( 11:00pm - 00:59am )</option>
+                  <option value="丑时 ( 01:00am - 02:59am )">丑时 ( 01:00am - 02:59am )</option>
+                  <option value="寅时 ( 03:00am - 04:59am )">寅时 ( 03:00am - 04:59am )</option>
+                  <option value="卯时 ( 05:00am - 06:59am )">卯时 ( 05:00am - 06:59am )</option>
+                  <option value="辰时 ( 07:00am - 08:59am )">辰时 ( 07:00am - 08:59am )</option>
+                  <option value="巳时 ( 09:00am - 10:59am )">巳时 ( 09:00am - 10:59am )</option>
+                  <option value="午时 ( 11:00am - 12:59pm )">午时 ( 11:00am - 12:59pm )</option>
+                  <option value="未时 ( 01:00pm - 02:59pm )">未时 ( 01:00pm - 02:59pm )</option>
+                  <option value="申时 ( 03:00pm - 04:59pm )">申时 ( 03:00pm - 04:59pm )</option>
+                  <option value="酉时 ( 05:00pm - 06:59pm )">酉时 ( 05:00pm - 06:59pm )</option>
+                  <option value="戌时 ( 07:00pm - 08:59pm )">戌时 ( 07:00pm - 08:59pm )</option>
+                  <option value="亥时 ( 09:00pm - 10:59pm )">亥时 ( 09:00pm - 10:59pm )</option>
                 </select>
                 <div class="invalid-feedback" id="customerTimeError" style="display: none;">
                   Please select your time of birth / 请选择出生时间
@@ -446,6 +525,157 @@
         // Function to hide all success badges when form data changes
         function hideSuccessBadges() {
           $('#customDataSavedBadge1, #customDataSavedBadge2').fadeOut('fast');
+        }
+
+        // Member Data dropdown functionality
+        let memberDataDropdown = $('.member-data-dropdown');
+        let memberDataList = $('.member-data-list');
+        let memberDataLoaded = false;
+
+        // Show dropdown when clicking on the name field
+        $('#customerName').on('focus', function() {
+          if (!memberDataLoaded) {
+            // Load member data records via AJAX
+            fetchMemberData();
+          }
+          memberDataDropdown.show();
+        });
+
+        // Hide dropdown when clicking outside
+        $(document).on('click', function(e) {
+          if (!$(e.target).closest('.custom-name-form').length) {
+            memberDataDropdown.hide();
+          }
+        });
+
+        // Hide dropdown when clicking the Cancel button
+        $('.member-data-cancel').on('click', function() {
+          memberDataDropdown.hide();
+        });
+
+        // Function to load member data records from the view data
+        function fetchMemberData() {
+          // Show loading indicator
+          $('.member-data-loading').show();
+          memberDataList.hide();
+
+          // Clear the list
+          memberDataList.empty();
+
+          // Get member data from the view data
+          const memberData = @json($member_data ?? []);
+
+          console.log('DEBUG: Member data from view:', memberData);
+          console.log('DEBUG: Member data length:', memberData.length);
+
+          // Check if we have member data records
+          if (memberData && memberData.length > 0) {
+            console.log('DEBUG: Found ' + memberData.length + ' member data records');
+
+            // Process each member data record
+            memberData.forEach(function(record, index) {
+              console.log('DEBUG: Processing record ' + index + ':', record);
+
+              // Create a member data item element
+              const item = $('<div class="member-data-item" data-id="' + record.id + '"></div>');
+              item.append('<div class="member-data-item-name">' + record.name + '</div>');
+              item.append('<div class="member-data-item-details">' + record.gender + ' | ' + record.zodiac + ' | ' + record.birth_date + '</div>');
+
+              // Store all data as data attributes
+              item.data('member-data', {
+                name: record.name,
+                gender: record.gender,
+                zodiac: record.zodiac,
+                birthDate: record.birth_date,
+                lunarDate: record.lunar_date,
+                birthTime: record.birth_time,
+                whatsapp: record.whatsapp
+              });
+
+              // Add click event to select this member data
+              item.on('click', function() {
+                selectMemberData($(this).data('member-data'));
+                memberDataDropdown.hide();
+              });
+
+              // Add to the list
+              memberDataList.append(item);
+              console.log('DEBUG: Added item to list:', item.html());
+            });
+          } else {
+            console.log('DEBUG: No member data records found');
+
+            // Check if user is logged in
+            @if(current_customer_id())
+              console.log('DEBUG: User logged in but no data found, showing create message');
+              memberDataList.html('<div class="no-member-data">No saved member data records found.<br><a href="{{ account_route('member_data.create') }}" target="_blank" class="btn btn-sm btn-primary mt-2">Create New Member Data</a></div>');
+            @else
+              console.log('DEBUG: User not logged in, showing login message');
+              memberDataList.html('<div class="no-member-data">Please <a href="{{ front_route('login.index') }}" target="_blank">log in</a> to access your saved member data.</div>');
+            @endif
+          }
+
+          // Hide loading indicator and show the list
+          $('.member-data-loading').hide();
+          memberDataList.show();
+          console.log('DEBUG: Final memberDataList HTML:', memberDataList.html());
+
+          // Mark as loaded
+          memberDataLoaded = true;
+        }
+
+        // Function to select a member data record and fill the form
+        function selectMemberData(data) {
+          // Fill the name field
+          $('#customerName').val(data.name);
+
+          // Select the gender radio button
+          if (data.gender.includes('Male') || data.gender.includes('男')) {
+            $('#genderMale').prop('checked', true);
+          } else if (data.gender.includes('Female') || data.gender.includes('女')) {
+            $('#genderFemale').prop('checked', true);
+          }
+
+          // Fill the date of birth field
+          $('#customerDOB').val(data.birthDate);
+
+          // Fill the lunar date field
+          $('#customerLunarDOB').val(data.lunarDate);
+
+          // Select the zodiac
+          const zodiacMap = {
+            'Rat': 'rat', 'Mouse': 'rat', '鼠': 'rat',
+            'Ox': 'ox', 'Cow': 'ox', '牛': 'ox',
+            'Tiger': 'tiger', '虎': 'tiger',
+            'Rabbit': 'rabbit', '兔': 'rabbit',
+            'Dragon': 'dragon', '龙': 'dragon',
+            'Snake': 'snake', '蛇': 'snake',
+            'Horse': 'horse', '马': 'horse',
+            'Goat': 'goat', 'Sheep': 'goat', '羊': 'goat',
+            'Monkey': 'monkey', '猴': 'monkey',
+            'Rooster': 'rooster', 'Chicken': 'rooster', '鸡': 'rooster',
+            'Dog': 'dog', '狗': 'dog',
+            'Pig': 'pig', '猪': 'pig'
+          };
+
+          // Try to match the zodiac
+          for (const [key, value] of Object.entries(zodiacMap)) {
+            if (data.zodiac.includes(key)) {
+              $('#customerZodiac').val(value);
+              break;
+            }
+          }
+
+          // Select the time of birth
+          // Set the value directly since we're now using the same format
+          $('#customerTimeOfBirth').val(data.birthTime);
+
+          // Fill the WhatsApp number
+          $('#customerWhatsApp').val(data.whatsapp);
+
+          // Hide any error messages
+          $('.invalid-feedback').hide();
+          $('.is-invalid').removeClass('is-invalid');
         }
 
         // Hide error message when user starts typing

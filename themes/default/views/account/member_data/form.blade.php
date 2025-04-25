@@ -108,6 +108,7 @@
                 <label for="birth_time" class="form-label">Birth Time <span class="text-danger">*</span></label>
                 <select class="form-select" id="birth_time" name="member_data[birth_time]" required>
                   <option value="">Please select</option>
+                  <option value="吉时（如不懂出生时辰）" {{ old('member_data.birth_time', $member->member_data['birth_time'] ?? '') == '吉时（如不懂出生时辰）' ? 'selected' : '' }}>吉时（如不懂出生时辰）</option>
                   <option value="子时 ( 11:00pm - 00:59am )" {{ old('member_data.birth_time', $member->member_data['birth_time'] ?? '') == '子时 ( 11:00pm - 00:59am )' ? 'selected' : '' }}>子时 ( 11:00pm - 00:59am )</option>
                   <option value="丑时 ( 01:00am - 02:59am )" {{ old('member_data.birth_time', $member->member_data['birth_time'] ?? '') == '丑时 ( 01:00am - 02:59am )' ? 'selected' : '' }}>丑时 ( 01:00am - 02:59am )</option>
                   <option value="寅时 ( 03:00am - 04:59am )" {{ old('member_data.birth_time', $member->member_data['birth_time'] ?? '') == '寅时 ( 03:00am - 04:59am )' ? 'selected' : '' }}>寅时 ( 03:00am - 04:59am )</option>

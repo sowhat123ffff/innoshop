@@ -138,6 +138,74 @@ class ProductController extends Controller
         $customerID = current_customer_id();
         $variables  = ProductVariable::collection($product->variables)->jsonSerialize();
 
+        // Get member data for the current customer
+        $memberData = [];
+
+        // Check if the member_data table exists
+        $memberDataTableExists = \Schema::hasTable('member_data');
+        \Log::debug('ProductController: Member data table exists?', [
+            'exists' => $memberDataTableExists
+        ]);
+
+        if (!$memberDataTableExists) {
+            \Log::error('ProductController: Member data table does not exist!');
+            // Don't add any dummy data when the table doesn't exist
+        } else if ($customerID) {
+            $filters = [
+                'customer_id' => $customerID,
+            ];
+
+            // Log for debugging
+            \Log::debug('ProductController: Fetching member data', [
+                'customer_id' => $customerID,
+                'filters' => $filters
+            ]);
+
+            try {
+                $memberDataItems = \InnoShop\Common\Repositories\MemberDataRepo::getInstance()->builder($filters)->get();
+
+                \Log::debug('ProductController: Found member data items', [
+                    'count' => count($memberDataItems)
+                ]);
+
+                foreach ($memberDataItems as $item) {
+                    \Log::debug('ProductController: Processing member data item', [
+                        'id' => $item->id,
+                        'member_data' => $item->member_data
+                    ]);
+
+                    $memberData[] = [
+                        'id' => $item->id,
+                        'name' => $item->member_data['name'] ?? '',
+                        'gender' => $item->member_data['gender'] ?? '',
+                        'zodiac' => $item->member_data['zodiac'] ?? '',
+                        'birth_date' => $item->member_data['birth_date'] ?? '',
+                        'lunar_date' => $item->member_data['lunar_date'] ?? '',
+                        'birth_time' => $item->member_data['birth_time'] ?? '',
+                        'whatsapp' => $item->member_data['whatsapp'] ?? '',
+                    ];
+                }
+
+                // If no member data found, don't add any dummy data
+                if (empty($memberData)) {
+                    \Log::debug('ProductController: No member data found for this customer');
+                    // The frontend will handle showing the "No member data found" message
+                }
+            } catch (\Exception $e) {
+                \Log::error('ProductController: Error fetching member data', [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+
+                // Don't add any dummy data when there's an error
+                // The frontend will handle showing an appropriate message
+            }
+        } else {
+            \Log::debug('ProductController: No customer ID, not adding any member data');
+            // Don't add any dummy data when user is not logged in
+            // The frontend will handle showing the login message
+        }
+
         $data = [
             'product'    => $product,
             'sku'        => (new SkuListItem($sku))->jsonSerialize(),
@@ -147,6 +215,7 @@ class ProductController extends Controller
             'reviews'    => ReviewListItem::collection($reviews)->jsonSerialize(),
             'reviewed'   => ReviewRepo::productReviewed($customerID, $product->id),
             'related'    => $product->relationProducts,
+            'member_data' => $memberData, // Add member data to the view
         ];
 
         return inno_view('products.show', $data);
