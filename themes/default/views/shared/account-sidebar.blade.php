@@ -23,13 +23,13 @@
       </a>
     </li>
     @hookinsert('front.account.sidebar.favorites.after')
-    
+
     <li class="{{ equal_route_name('front.account.transactions.index') ? 'active' : '' }}">
       <a href="{{ account_route('transactions.index') }}"><i class="bi bi-wallet"></i>{{ front_trans('account.transactions') }}
       </a>
     </li>
     @hookinsert('front.account.sidebar.transactions.after')
-    
+
     <li class="{{ equal_route_name('front.account.reviews.index') ? 'active' : '' }}">
       <a href="{{ account_route('reviews.index') }}"><i class="bi bi-chat-dots"></i>{{ front_trans('account.reviews') }}
       </a>
@@ -41,6 +41,12 @@
             class="bi bi-geo-alt"></i>{{ front_trans('account.addresses') }}</a>
     </li>
     @hookinsert('front.account.sidebar.addresses.after')
+
+    <li class="{{ equal_route_name('front.account.member_data.index') ? 'active' : '' }}">
+      <a href="{{ account_route('member_data.index') }}"><i
+            class="bi bi-person-vcard"></i>Member Data</a>
+    </li>
+    @hookinsert('front.account.sidebar.member_data.after')
 
     <li class="{{ equal_route_name(['front.account.order_returns.index', 'front.account.order_returns.create',
 'front.account.order_returns.show']) ? 'active' : '' }}">

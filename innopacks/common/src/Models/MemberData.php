@@ -10,14 +10,14 @@
 namespace InnoShop\Common\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use InnoShop\Common\Models\BaseModel;
 
-class Address extends BaseModel
+class MemberData extends BaseModel
 {
-    protected $table = 'addresses';
+    protected $table = 'member_data';
 
     protected $fillable = [
-        'customer_id', 'guest_id', 'name', 'email', 'phone', 'country_id', 'state_id', 'state', 'city_id', 'city',
-        'zipcode', 'address_1', 'address_2', 'member_data',
+        'customer_id', 'member_data',
     ];
 
     protected $casts = [
@@ -25,26 +25,10 @@ class Address extends BaseModel
     ];
 
     /**
-     * @return BelongsTo
+     * Get the customer that owns the member data.
      */
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class, 'customer_id');
-    }
-
-    /**
-     * @return BelongsTo
-     */
-    public function country(): BelongsTo
-    {
-        return $this->belongsTo(Country::class, 'country_id');
-    }
-
-    /**
-     * @return BelongsTo
-     */
-    public function state(): BelongsTo
-    {
-        return $this->belongsTo(State::class, 'state_id');
     }
 }

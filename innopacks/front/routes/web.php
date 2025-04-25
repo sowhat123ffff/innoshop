@@ -131,6 +131,14 @@ Route::prefix('account')
         Route::put('/addresses/{address}', [Account\AddressesController::class, 'update'])->name('addresses.update');
         Route::delete('/addresses/{address}', [Account\AddressesController::class, 'destroy'])->name('addresses.destroy');
 
+        // Member Data
+        Route::get('/member_data', [Account\MemberDataController::class, 'index'])->name('member_data.index');
+        Route::get('/member_data/create', [Account\MemberDataController::class, 'create'])->name('member_data.create');
+        Route::post('/member_data', [Account\MemberDataController::class, 'store'])->name('member_data.store');
+        Route::get('/member_data/{memberData}/edit', [Account\MemberDataController::class, 'edit'])->name('member_data.edit');
+        Route::put('/member_data/{memberData}', [Account\MemberDataController::class, 'update'])->name('member_data.update');
+        Route::delete('/member_data/{memberData}', [Account\MemberDataController::class, 'destroy'])->name('member_data.destroy');
+
         Route::get('/edit', [Account\EditController::class, 'index'])->name('edit.index');
         Route::put('/edit', [Account\EditController::class, 'update'])->name('edit.update');
 

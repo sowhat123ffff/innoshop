@@ -163,7 +163,7 @@ class AddressRepo extends BaseRepo
             $stateRow = State::query()->find($stateID);
         }
 
-        return [
+        $data = [
             'customer_id' => $requestData['customer_id'] ?? 0,
             'guest_id'    => $requestData['guest_id']    ?? '',
             'name'        => $requestData['name'],
@@ -179,5 +179,12 @@ class AddressRepo extends BaseRepo
             'address_2'   => $requestData['address_2']  ?? '',
             'default'     => $requestData['default']    ?? false,
         ];
+
+        // Handle member data if provided
+        if (isset($requestData['member_data']) && is_array($requestData['member_data'])) {
+            $data['member_data'] = $requestData['member_data'];
+        }
+
+        return $data;
     }
 }

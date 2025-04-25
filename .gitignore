@@ -16,3 +16,6 @@ auth.json
 npm-debug.log
 yarn-error.log
 webpack.mix.js
+innopacks/common/database/migrations/2025_05_10_000001_create_inno_member_data_table.php
+innopacks/common/database/migrations/2025_05_01_000001_add_member_data_to_addresses_table.php
+innopacks/common/database/migrations/2025_05_12_000001_rename_member_data_table.php

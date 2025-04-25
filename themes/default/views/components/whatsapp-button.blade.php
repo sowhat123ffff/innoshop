@@ -20,7 +20,7 @@
         <img src="{{ asset('images/product-enquiry-icon.png') }}" alt="Product Enquiry" onerror="this.src='{{ asset('images/whatsapp-logo.png') }}'">
       </div>
       <div class="whatsapp-option-info">
-        <a href="https://wa.me/60123456789" target="_blank" rel="noopener noreferrer">
+        <a href="https://wa.me/60134315111" target="_blank" rel="noopener noreferrer">
           <h4>产品询问热线</h4>
           <p>Product Enquiry Hotline</p>
         </a>
@@ -31,7 +31,7 @@
         <img src="{{ asset('images/fengshui-enquiry-icon.png') }}" alt="Feng Shui Enquiry" onerror="this.src='{{ asset('images/whatsapp-logo.png') }}'">
       </div>
       <div class="whatsapp-option-info">
-        <a href="https://wa.me/60123456788" target="_blank" rel="noopener noreferrer">
+        <a href="https://wa.me/60134315111" target="_blank" rel="noopener noreferrer">
           <h4>命理 / 风水询问热线</h4>
           <p>Feng Shui Enquiry Hotline</p>
         </a>
