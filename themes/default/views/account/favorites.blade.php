@@ -30,7 +30,7 @@
                   </a>
                 </div>
                 <div class="product-item-info">
-                  <div class="product-name"><a href="{{ $product->url }}">{{ $product->translation->name }}</a></div>
+                  <div class="product-name"><a href="{{ $product->url }}">{!! $product->translation->name !!}</a></div>
                   <div class="product-bottom">
                     <div class="product-bottom-btns">
                       <div class="btn-add-cart cursor-pointer" data-id="{{ $product->id }}"

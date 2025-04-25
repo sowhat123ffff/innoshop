@@ -6,7 +6,7 @@ This changelog documents all changes made to implement and improve the custom fo
 
 ### Summary of Changes Made on 26-Apr-2025
 
-In this update, we made several improvements to the Member Data functionality and fixed issues with the help popup and form validation. We also documented the initial implementation of the Member Data feature, which allows customers to save and reuse personal information across multiple purchases.
+In this update, we made several improvements to the Member Data functionality and fixed issues with the help popup and form validation. We also documented the initial implementation of the Member Data feature, which allows customers to save and reuse personal information across multiple purchases. Additionally, we fixed an issue with HTML tags displaying in product names on the favorites page.
 
 ### 1. Implemented Accordion-Style Q&A in Member Data Help Popup (themes/default/views/account/member_data/index.blade.php)
 
@@ -99,7 +99,21 @@ class MemberData extends BaseModel
 }
 ```
 
-### 4. Benefits of the Changes
+### 4. Fixed HTML Tags in Product Names (themes/default/views/account/favorites.blade.php)
+
+- Fixed an issue where HTML tags (like `<br>`) were displaying as plain text in product names on the favorites page
+- Changed the template to properly render HTML content in product names using the `{!! !!}` syntax instead of `{{ }}`
+- This ensures that line breaks and other formatting in product names display correctly
+
+```php
+// Changed from:
+<div class="product-name"><a href="{{ $product->url }}">{{ $product->translation->name }}</a></div>
+
+// Changed to:
+<div class="product-name"><a href="{{ $product->url }}">{!! $product->translation->name !!}</a></div>
+```
+
+### 5. Benefits of the Changes
 
 - Improved user experience with a cleaner, more interactive help popup
 - Enhanced bilingual support with Chinese characters for gender and zodiac fields
