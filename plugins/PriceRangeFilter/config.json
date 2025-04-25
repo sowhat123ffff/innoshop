@@ -1,0 +1,9 @@
+{
+    "code": "price_range_filter",
+    "name": {"zh_cn": "价格区间筛选", "en": "Price Range Filter"},
+    "description": {"zh_cn": "在商品列表页通过滑块筛选价格区间", "en": "Filter products by price range using a slider on the product listing page."},
+    "type": "feature",
+    "version": "v1.0.0",
+    "icon": "/images/logo.png",
+    "author": {"name": "InnoShop", "email": "edward@innoshop.com"}
+}

@@ -5,91 +5,89 @@ namespace Plugin\Curlec\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Razorpay\Api\Api;
+use Illuminate\Http\JsonResponse;
 
 class PaymentController
 {
     /**
-     * Create a Razorpay order and return the order details.
-     * This method should be called from your payment initiation route.
+     * Create a Razorpay order and return the order details (JSON response).
+     * Called via POST /payment/curlec/order
+     *
+     * @param Request $request
+     * @return JsonResponse
      */
-    public function createOrder(Request $request)
+    public function createOrder(Request $request): JsonResponse
     {
-        Log::debug('Curlec PaymentController: createOrder called', [
-            'request_all' => $request->all(),
+        $locale = $request->route('locale') ?? app()->getLocale();
+        Log::info('[Curlec] PaymentController::createOrder - Called', [
+            'request' => $request->all(),
             'headers' => $request->headers->all(),
-            'is_ajax' => $request->ajax(),
-            'expects_json' => $request->expectsJson(),
-            'accept_header' => $request->header('Accept'),
+            'locale' => $locale,
+            'route_params' => $request->route() ? $request->route()->parameters() : null,
+            'full_url' => $request->fullUrl(),
         ]);
-        if (!$request->ajax() && !$request->expectsJson()) {
-            Log::warning('Curlec PaymentController: Request is NOT AJAX and does NOT expect JSON', [
-                'headers' => $request->headers->all()
-            ]);
-        }
+
+        // Validate input
+        $validated = $request->validate([
+            'receipt'  => 'required|string|max:64',
+            'amount'   => 'required|integer|min:100', // Razorpay min 100 paise (RM1)
+            'currency' => 'sometimes|string|size:3',
+        ]);
+        $receipt  = $validated['receipt'];
+        $amount   = $validated['amount'];
+        $currency = $validated['currency'] ?? 'MYR';
 
         // Retrieve plugin settings
         $settings = plugin_setting('curlec');
-        Log::debug('Curlec PaymentController: plugin_setting(curlec)', [
-            'settings' => $settings
-        ]);
-        $keyId = $settings['key_id'] ?? '';
-        $keySecret = $settings['key_secret'] ?? '';
-        $testMode = $settings['test_mode'] ?? true;
+        $keyId     = $settings['key_id'] ?? null;
+        $keySecret = $settings['key_secret'] ?? null;
+        $testMode  = $settings['test_mode'] ?? true;
+
+        if (!$keyId || !$keySecret) {
+            Log::error('[Curlec] Missing API credentials', ['key_id' => $keyId, 'key_secret' => $keySecret]);
+            return response()->json([
+                'error' => 'Curlec plugin misconfigured: missing API credentials.'
+            ], 500);
+        }
 
         // Initialize Razorpay API
-        Log::debug('Curlec PaymentController: Initializing Razorpay API', [
-            'key_id' => $keyId,
-            'test_mode' => $testMode
-        ]);
-        $api = new Api($keyId, $keySecret);
+        try {
+            $api = new Api($keyId, $keySecret);
+        } catch (\Throwable $e) {
+            Log::error('[Curlec] Failed to initialize Razorpay API', ['error' => $e->getMessage()]);
+            return response()->json(['error' => 'Payment gateway unavailable.'], 500);
+        }
 
         // Prepare order data
         $orderData = [
-            'receipt'         => $request->input('receipt', uniqid('curlec_')),
-            'amount'          => $request->input('amount'), // Amount in paise (e.g., 1000 = ₹10)
-            'currency'        => $request->input('currency', 'MYR'),
-            'payment_capture' => 1 // Auto-capture
+            'receipt'         => $receipt,
+            'amount'          => $amount,
+            'currency'        => $currency,
+            'payment_capture' => 1,
         ];
-        Log::debug('Curlec PaymentController: Prepared order data', [
-            'orderData' => $orderData
-        ]);
+        Log::debug('[Curlec] Order data', $orderData);
 
+        // Create order
         try {
-            // Create order
-            Log::debug('Curlec PaymentController: Calling $api->order->create');
             $order = $api->order->create($orderData);
-            // Log the full Curlec/Razorpay response
-            Log::debug('Curlec PaymentController: Curlec API Order Response', [
-                'order' => $order
+            Log::info('[Curlec] Order created', [
+                'order_id' => $order['id'],
+                'amount'   => $order['amount'],
+                'currency' => $order['currency']
             ]);
-
-            // Return order details (for frontend to use in Razorpay Checkout)
-            $response = [
+            return response()->json([
                 'order_id' => $order['id'],
                 'amount'   => $order['amount'],
                 'currency' => $order['currency'],
                 'key_id'   => $keyId,
                 'test_mode'=> $testMode
-            ];
-            Log::debug('Curlec PaymentController: Returning JSON response', [
-                'response' => $response
             ]);
-            return response()->json($response);
-        } catch (\Exception $e) {
-            // Log the exception for debugging
-            Log::error('Curlec PaymentController: Curlec API Order Exception', [
-                'message' => $e->getMessage(),
-                'exception' => $e,
-                'trace' => $e->getTraceAsString(),
-            ]);
-            $errorResponse = [
-                'error' => 'Failed to create Curlec order',
-                'message' => $e->getMessage(),
-            ];
-            Log::debug('Curlec PaymentController: Returning ERROR JSON response', [
-                'response' => $errorResponse
-            ]);
-            return response()->json($errorResponse, 500);
+        } catch (\Throwable $e) {
+            Log::error('[Curlec] Order creation failed', ['error' => $e->getMessage(), 'orderData' => $orderData]);
+            $routeName = $locale . '.front.curlec.payment.order';
+            return response()->json([
+                'error' => 'Failed to create payment order. Please try again later.'
+            ], 500);
         }
     }
 }

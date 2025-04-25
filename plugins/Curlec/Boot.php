@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) Since 2024 InnoShop - All Rights Reserved
+ * Curlec (Razorpay) Payment Plugin Bootstrap
  *
  * @link       https://www.innoshop.com
  * @author     InnoShop <team@innoshop.com>
@@ -14,29 +14,36 @@ use Illuminate\Support\Facades\Log;
 class Boot
 {
     /**
-     * Method executed when the plugin is initialized.
+     * Initialize the Curlec plugin: load routes, register hooks, and perform startup checks.
      */
     public function init(): void
     {
-        Log::debug('Curlec Plugin: Boot::init() called');
+        Log::info('[Curlec] Boot::init() - Initializing Curlec payment plugin.');
 
-        // Register plugin routes
-        if (file_exists(__DIR__ . '/Routes/front.php')) {
-            Log::debug('Curlec Plugin: Loading Routes/front.php');
-            require_once __DIR__ . '/Routes/front.php';
-            Log::debug('Curlec Plugin: Routes/front.php loaded successfully');
+        // Load plugin routes (front.php)
+        $routePath = __DIR__ . '/Routes/front.php';
+        if (file_exists($routePath)) {
+            try {
+                require_once $routePath;
+                Log::info('[Curlec] Routes loaded: ' . $routePath);
+            } catch (\Throwable $e) {
+                Log::error('[Curlec] Failed to load routes: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            }
         } else {
-            Log::warning('Curlec Plugin: Routes/front.php not found');
+            Log::warning('[Curlec] Route file not found: ' . $routePath);
         }
 
-        Log::debug('Curlec Plugin: Registering hook filter service.payment.api.curlec.data');
+        // Register payment API data hook
         listen_hook_filter('service.payment.api.curlec.data', function ($data) {
-            Log::debug('Curlec Plugin: service.payment.api.curlec.data hook called', ['data_in' => $data]);
-            // Inject Curlec (Razorpay) plugin settings into the payment data
-            $data['params'] = plugin_setting('curlec');
-            Log::debug('Curlec Plugin: service.payment.api.curlec.data hook returning', ['data_out' => $data]);
+            Log::debug('[Curlec] service.payment.api.curlec.data hook called', ['data_in' => $data]);
+            try {
+                $data['params'] = plugin_setting('curlec');
+            } catch (\Throwable $e) {
+                Log::error('[Curlec] Failed to inject plugin settings: ' . $e->getMessage());
+            }
+            Log::debug('[Curlec] service.payment.api.curlec.data hook returning', ['data_out' => $data]);
             return $data;
         });
-        Log::debug('Curlec Plugin: Hook filter registered');
+        Log::info('[Curlec] Hook registered: service.payment.api.curlec.data');
     }
 }

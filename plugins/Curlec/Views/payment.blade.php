@@ -45,12 +45,13 @@
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 @php
     $locale = app()->getLocale();
+    $routeName = $locale . '.front.curlec.payment.order';
     $locales = function_exists('locales') ? locales() : [];
-    if (is_array($locales) && count($locales) > 1) {
-        $routeName = $locale . '.front.curlec.payment.order';
-    } else {
-        $routeName = 'front.curlec.payment.order';
-    }
+    \Log::debug('Curlec Payment: Locale debug', [
+        'locale' => $locale,
+        'routeName' => $routeName,
+        'locales' => $locales,
+    ]);
     try {
         \Log::debug('Curlec Payment: Attempting to resolve route', ['route' => $routeName]);
         $curlecOrderRoute = route($routeName);
