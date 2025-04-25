@@ -2,7 +2,116 @@
 
 This changelog documents all changes made to implement and improve the custom form functionality in the InnoShop platform.
 
-## Latest Changes (25-Apr-2025)
+## Latest Changes (26-Apr-2025)
+
+### Summary of Changes Made on 26-Apr-2025
+
+In this update, we made several improvements to the Member Data functionality and fixed issues with the help popup and form validation. We also documented the initial implementation of the Member Data feature, which allows customers to save and reuse personal information across multiple purchases.
+
+### 1. Implemented Accordion-Style Q&A in Member Data Help Popup (themes/default/views/account/member_data/index.blade.php)
+
+- Converted the help popup Q&A section to an accordion-style interface
+- Added toggle icons (+) to each question that rotate when expanded
+- Implemented JavaScript to show only one answer at a time
+- Added smooth animations for expanding/collapsing answers
+- Fixed a route error with the Privacy Policy link by using a JavaScript void link
+- Enhanced the styling with better spacing, colors, and transitions
+
+```html
+<div class="member-data-question" data-qa="1">
+  <p>(Q) What is Member Data?</p>
+  <p>(问) 什么是成员资料?</p>
+  <span class="qa-toggle"><i class="bi bi-plus"></i></span>
+</div>
+<div class="member-data-answer" id="qa-answer-1">
+  <p>(A) Member Data are key personal records like Chinese name, gender, Solar and Lunar Dates of Birth, mobile number and etc.</p>
+  <p>(答) 成员资料是主要的个人记录，如中文姓名、性别、出生日期、手机号码等。</p>
+</div>
+```
+
+```css
+.member-data-question.active .qa-toggle i {
+  transform: rotate(45deg);
+}
+
+.member-data-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  opacity: 0;
+}
+
+.member-data-answer.active {
+  max-height: 500px;
+  opacity: 1;
+}
+```
+
+### 2. Added Chinese Characters to Gender and Zodiac Fields (themes/default/views/account/member_data/form.blade.php)
+
+- Updated the Gender radio buttons to display "男 Male" and "女 Female"
+- Updated the Zodiac dropdown to include Chinese characters for each zodiac sign:
+  - 鼠 Rat, 牛 Ox, 虎 Tiger, 兔 Rabbit, 龙 Dragon, 蛇 Snake, 马 Horse, 羊 Goat, 猴 Monkey, 鸡 Rooster, 狗 Dog, 猪 Pig
+- Updated the auto-selection function for zodiac signs to use the new values with Chinese characters
+- Fixed validation rules in MemberDataController to accept the new format with Chinese characters
+
+```html
+<div class="form-check form-check-inline">
+  <input class="form-check-input" type="radio" name="member_data[gender]" id="genderMale" value="男 Male" required>
+  <label class="form-check-label" for="genderMale">男 Male</label>
+</div>
+```
+
+```php
+// Updated validation rule in MemberDataController
+'member_data.gender' => 'required|in:Male,Female,男 Male,女 Female',
+```
+
+### 3. Member Data Feature Implementation (New Functionality)
+
+- Created a dedicated Member Data section in the customer account area
+- Implemented a database table structure to store customer member data records
+- Added ability for customers to create, edit, and delete member data entries
+- Implemented a form with fields for:
+  - Name (Chinese Original Name)
+  - Gender (Male/Female with Chinese characters)
+  - Chinese Zodiac (with automatic selection based on birth date)
+  - Birth Date (with automatic conversion to Lunar Date)
+  - Birth Time (using traditional Chinese time periods)
+  - WhatsApp number
+- Created a comprehensive help section explaining the purpose and benefits of Member Data
+- Added integration with product custom forms to allow reuse of saved member data
+- Implemented proper validation for all fields
+
+```php
+// Member Data model structure
+class MemberData extends BaseModel
+{
+    protected $table = 'member_data';
+
+    protected $fillable = [
+        'customer_id', 'member_data',
+    ];
+
+    protected $casts = [
+        'member_data' => 'array',
+    ];
+}
+```
+
+### 4. Benefits of the Changes
+
+- Improved user experience with a cleaner, more interactive help popup
+- Enhanced bilingual support with Chinese characters for gender and zodiac fields
+- Fixed validation errors when saving member data with Chinese characters
+- Better organization of help content with accordion-style Q&A
+- Smoother animations and transitions for a more polished interface
+- Customers can now save personal information for reuse across multiple purchases
+- Reduced data entry time for returning customers
+- Improved accuracy of customer information with proper validation
+- Enhanced support for Chinese language and cultural elements (zodiac, lunar calendar)
+
+## Previous Changes (25-Apr-2025)
 
 ### Summary of Changes Made on 25-Apr-2025
 
