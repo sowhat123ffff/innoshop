@@ -1950,7 +1950,7 @@
         loadFiles(path = null) {
           this.loading = true;
           const currentPath = path !== null ? path : (this.currentFolder ? this.currentFolder.path : '/');
-          
+
           const params = {
             page: this.pagination.page,
             per_page: this.pagination.per_page,
@@ -2072,9 +2072,30 @@
 
             // 确认裁剪
             dialog.querySelector('.confirm-btn').onclick = () => {
+              // Get original image dimensions to maintain aspect ratio
+              const originalImage = new Image();
+              originalImage.src = e.target.result;
+
+              // Use original dimensions or limit to a maximum width/height while preserving aspect ratio
+              let maxWidth = 1920;
+              let maxHeight = 1920;
+              let width = originalImage.width;
+              let height = originalImage.height;
+
+              // If image is larger than max dimensions, scale it down proportionally
+              if (width > maxWidth || height > maxHeight) {
+                if (width / height > maxWidth / maxHeight) {
+                  height = height * (maxWidth / width);
+                  width = maxWidth;
+                } else {
+                  width = width * (maxHeight / height);
+                  height = maxHeight;
+                }
+              }
+
               const canvas = cropper.getCroppedCanvas({
-                width: 800,
-                height: 800
+                width: Math.round(width),
+                height: Math.round(height)
               });
 
               canvas.toBlob((blob) => {

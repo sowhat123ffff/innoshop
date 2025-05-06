@@ -95,7 +95,9 @@ class ImageService
                 $manager = new ImageManager(new Driver);
                 $image   = $manager->read($this->imagePath);
 
-                $image->cover($width, $height);
+                // Use contain instead of cover to ensure the entire image is visible
+                // and no part of the image is cropped
+                $image->contain($width, $height);
                 $image->save($newImagePath);
             }
 
