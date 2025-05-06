@@ -45,6 +45,9 @@
                   <x-common-form-input title="{{ __('panel/article.title') }}" name="translations[{{$localeCode}}][title]"
                     :translate="true"  value="{{ old('translations.' . $localeCode . '.title', $page->translate($localeCode, 'title')) }}"/>
 
+                  <x-common-form-input title="{{ __('panel/article.sub_title') }}" name="translations[{{$localeCode}}][sub_title]"
+                    :translate="true"  value="{{ old('translations.' . $localeCode . '.sub_title', $page->translate($localeCode, 'sub_title')) }}"/>
+
                   <x-panel::form.row title="{{ __('panel/article.content') }}" width="900" :translate="true">
                     <ul class="nav nav-tabs mb-3 code-tabs" role="tablist">
                       <li class="nav-item" role="presentation">

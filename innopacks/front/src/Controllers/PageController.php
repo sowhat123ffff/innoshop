@@ -36,9 +36,13 @@ class PageController extends Controller
         $page = PageRepo::getInstance()->builder($filters)->firstOrFail();
         $page->increment('viewed');
 
+        // Get all active pages for the sidebar
+        $all_pages = PageRepo::getInstance()->builder(['active' => true])->orderBy('id')->get();
+
         $data = [
-            'slug' => $slug,
-            'page' => $page,
+            'slug'      => $slug,
+            'page'      => $page,
+            'all_pages' => $all_pages,
         ];
         $template = $page->translation->template ?? '';
         if ($template) {

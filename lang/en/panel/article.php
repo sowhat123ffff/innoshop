@@ -10,6 +10,7 @@
 return [
     'image'      => 'Image',
     'title'      => 'Title',
+    'sub_title'  => 'Sub Title',
     'content'    => 'Content',
     'summary'    => 'Summary',
     'catalog'    => 'Catalog',

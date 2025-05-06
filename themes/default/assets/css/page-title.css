@@ -1,0 +1,32 @@
+.page-title-container {
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.page-title-container .title-box {
+  padding: 20px 0;
+}
+
+.page-title-container .title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.page-title-container .sub-title {
+  font-size: 18px;
+  color: #666;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .page-title-container .title {
+    font-size: 24px;
+  }
+  
+  .page-title-container .sub-title {
+    font-size: 16px;
+  }
+}

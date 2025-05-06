@@ -18,6 +18,7 @@
   <script src="{{ asset('vendor/layer/3.5.1/layer.js') }}"></script>
   <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
   <link rel="stylesheet" href="{{ mix('build/front/css/app.css') }}">
+  <link rel="stylesheet" href="{{ asset('themes/default/assets/css/page-title.css') }}">
   <script>
     let urls = {
       api_base: '{{ route('api.home.base') }}',

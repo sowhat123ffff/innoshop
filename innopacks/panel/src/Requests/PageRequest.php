@@ -44,9 +44,10 @@ class PageRequest extends FormRequest
             'position' => 'integer',
             'active'   => 'bool',
 
-            "translations.$defaultLocale.locale"  => 'required',
-            "translations.$defaultLocale.title"   => 'required',
-            "translations.$defaultLocale.content" => 'required',
+            "translations.$defaultLocale.locale"    => 'required',
+            "translations.$defaultLocale.title"     => 'required',
+            "translations.$defaultLocale.sub_title" => 'nullable|string',
+            "translations.$defaultLocale.content"   => 'required',
         ];
     }
 
@@ -58,9 +59,10 @@ class PageRequest extends FormRequest
         $defaultLocale = setting_locale_code();
 
         return [
-            "translations.$defaultLocale.locale"  => trans('panel/page.locale'),
-            "translations.$defaultLocale.title"   => trans('panel/page.title'),
-            "translations.$defaultLocale.content" => trans('panel/page.content'),
+            "translations.$defaultLocale.locale"    => trans('panel/page.locale'),
+            "translations.$defaultLocale.title"     => trans('panel/page.title'),
+            "translations.$defaultLocale.sub_title" => trans('panel/article.sub_title'),
+            "translations.$defaultLocale.content"   => trans('panel/page.content'),
         ];
     }
 }
