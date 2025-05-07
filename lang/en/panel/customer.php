@@ -21,6 +21,7 @@ return [
     'level'          => 'Level',
     'locale'         => 'Locale',
     'login_frontend' => 'Login',
+    'member_data'    => 'Member Data',
     'mini_cost'      => 'Minimum Consumption Amount',
     'name'           => 'Name',
     'password'       => 'Password',

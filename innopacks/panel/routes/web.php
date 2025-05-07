@@ -69,6 +69,11 @@ Route::middleware(['admin_auth:admin'])
         Route::get('/customers/{customer}/login', [Controllers\CustomerController::class, 'loginFrontend'])->name('customers.login');
         Route::put('/customers/{customer}/active', [Controllers\CustomerController::class, 'active'])->name('customers.active');
 
+        // Member Data routes
+        Route::post('/member_data', [Controllers\MemberDataController::class, 'store'])->name('member_data.store');
+        Route::put('/member_data/{id}', [Controllers\MemberDataController::class, 'update'])->name('member_data.update');
+        Route::delete('/member_data/{id}', [Controllers\MemberDataController::class, 'destroy'])->name('member_data.destroy');
+
         Route::get('/transactions', [Controllers\TransactionController::class, 'index'])->name('transactions.index');
         Route::get('/transactions/create', [Controllers\TransactionController::class, 'create'])->name('transactions.create');
         Route::post('/transactions', [Controllers\TransactionController::class, 'store'])->name('transactions.store');
