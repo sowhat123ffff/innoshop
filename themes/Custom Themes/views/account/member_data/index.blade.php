@@ -3,6 +3,15 @@
 
 @section('title', 'Member Data')
 
+@push('header')
+<style>
+  /* Ensure popup is hidden from the very beginning of page load */
+  #member-data-help-popup {
+    display: none !important;
+  }
+</style>
+@endpush
+
 @section('content')
   <x-front-breadcrumb type="route" value="account.member_data.index" title="Member Data"/>
 
@@ -115,7 +124,7 @@
 @endsection
 
 <!-- Member Data Help Popup -->
-<div id="member-data-help-popup" class="member-data-help-popup">
+<div id="member-data-help-popup" class="member-data-help-popup" style="display: none;">
   <div class="member-data-help-content">
     <div class="member-data-help-header">
       <h3>Member Data Help</h3>
@@ -206,6 +215,11 @@
   }
   .btn-outline-primary:hover, .btn-outline-danger:hover, .btn-outline-info:hover {
     transform: translateY(-2px);
+  }
+
+  /* Hide popup by default to prevent flashing during page load */
+  #member-data-help-popup {
+    display: none !important;
   }
 
   /* Member Data Help Popup Styles */
@@ -391,6 +405,11 @@
     const closeButton = document.getElementById('member-data-help-close');
     const questions = document.querySelectorAll('.member-data-question');
 
+    // Ensure popup is hidden on page load
+    if (helpPopup) {
+      helpPopup.style.display = 'none';
+    }
+
     // Initially hide all answers
     document.querySelectorAll('.member-data-answer').forEach(answer => {
       answer.classList.remove('active');
@@ -398,13 +417,14 @@
 
     // Show popup when help button is clicked
     helpButton.addEventListener('click', function() {
-      helpPopup.style.display = 'block';
+      // Override the !important CSS rule
+      helpPopup.style.cssText = 'display: block !important';
       document.body.style.overflow = 'hidden'; // Prevent scrolling behind popup
     });
 
     // Hide popup when close button is clicked
     closeButton.addEventListener('click', function() {
-      helpPopup.style.display = 'none';
+      helpPopup.style.cssText = 'display: none !important';
       document.body.style.overflow = ''; // Restore scrolling
 
       // Reset all questions/answers when closing
@@ -414,7 +434,7 @@
     // Hide popup when clicking outside the content
     helpPopup.addEventListener('click', function(e) {
       if (e.target === helpPopup) {
-        helpPopup.style.display = 'none';
+        helpPopup.style.cssText = 'display: none !important';
         document.body.style.overflow = ''; // Restore scrolling
 
         // Reset all questions/answers when closing
@@ -424,8 +444,8 @@
 
     // Close popup when ESC key is pressed
     document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape' && helpPopup.style.display === 'block') {
-        helpPopup.style.display = 'none';
+      if (e.key === 'Escape' && helpPopup.style.display !== 'none') {
+        helpPopup.style.cssText = 'display: none !important';
         document.body.style.overflow = ''; // Restore scrolling
 
         // Reset all questions/answers when closing
